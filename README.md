@@ -87,7 +87,9 @@ npx lit-localize build
 ```
 
 ## TODO
-- [*]: localization
-- []: storybook
-- []: github
-- []: tests
+- [x] localization
+- [x] storybook
+- [x] github
+- [x] codecov
+- [ ] npm
+- [ ] tests
