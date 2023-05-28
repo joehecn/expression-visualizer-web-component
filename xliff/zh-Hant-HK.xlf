@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+<file target-language="zh-Hant-HK" source-language="en" original="lit-localize-inputs" datatype="plaintext">
+<body>
+<trans-unit id="s910d7e29a693eab8">
+  <source>Add constant</source>
+  <target>新增常數</target>
+</trans-unit>
+<trans-unit id="s811efc6e8affaf9e">
+  <source>Enter a constant</source>
+  <target>輸入常數</target>
+</trans-unit>
+<trans-unit id="saf63a64c860190ca">
+  <source>+</source>
+  <target>加</target>
+</trans-unit>
+<trans-unit id="saf63a04c86018698">
+  <source>-</source>
+  <target>減</target>
+</trans-unit>
+<trans-unit id="saf63a74c8601927d">
+  <source>*</source>
+  <target>乘</target>
+</trans-unit>
+<trans-unit id="saf63a24c860189fe">
+  <source>/</source>
+  <target>除</target>
+</trans-unit>
+<trans-unit id="saf63b34c8601a6e1">
+  <source>&gt;</source>
+  <target>大於</target>
+</trans-unit>
+<trans-unit id="saf63b14c8601a37b">
+  <source>&lt;</source>
+  <target>小於</target>
+</trans-unit>
+<trans-unit id="s08108707b4ce87d4">
+  <source>&gt;=</source>
+  <target>大於等於</target>
+</trans-unit>
+<trans-unit id="s08098b07b4c86ff2">
+  <source>&lt;=</source>
+  <target>小於等於</target>
+</trans-unit>
+<trans-unit id="s08068707b4c6334f">
+  <source>==</source>
+  <target>等於</target>
+</trans-unit>
+<trans-unit id="s07c28707b48c6683">
+  <source>!=</source>
+  <target>不等於</target>
+</trans-unit>
+<trans-unit id="se6f79719051ff286">
+  <source>and</source>
+  <target>與</target>
+</trans-unit>
+<trans-unit id="s08b05407b5565ca4">
+  <source>or</source>
+  <target>或</target>
+</trans-unit>
+<trans-unit id="sbfa9b2197fe7163e">
+  <source>xor</source>
+  <target>異或</target>
+</trans-unit>
+<trans-unit id="s215ad619258e9f4a">
+  <source>not</source>
+  <target>非</target>
+</trans-unit>
+<trans-unit id="sc89cd442be811d18">
+  <source>equalText</source>
+  <target>等於文本</target>
+</trans-unit>
+<trans-unit id="sdc673e73b5c13aea">
+  <source>Delete</source>
+  <target>刪除</target>
+</trans-unit>
+</body>
+</file>
+</xliff>
