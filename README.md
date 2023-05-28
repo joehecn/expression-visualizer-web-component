@@ -1,5 +1,7 @@
 # \<expression-visualizer-web-component>
 
+[![codecov](https://codecov.io/gh/joehecn/expression-visualizer-web-component/branch/main/graph/badge.svg?token=XVVTCISZZQ)](https://codecov.io/gh/joehecn/expression-visualizer-web-component)
+
 This webcomponent follows the [open-wc](https://github.com/open-wc/open-wc) recommendation.
 
 ## Installation
