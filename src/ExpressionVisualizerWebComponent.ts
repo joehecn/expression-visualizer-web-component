@@ -53,10 +53,12 @@ let that: any = null;
 
 // 缓存一下
 let _scope: any = null;
-function _getScope(variables: {
-  name: string;
-  test: string | number | boolean;
-}[]) {
+function _getScope(
+  variables: {
+    name: string;
+    test: string | number | boolean;
+  }[]
+) {
   if (_scope) return _scope;
 
   const scope: any = {};

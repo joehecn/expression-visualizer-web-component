@@ -9,7 +9,7 @@ function _handleDragStart(e: DragEvent) {
   const { id } = e.target! as HTMLElement;
   e.dataTransfer!.setData('text/plain', id);
   e.dataTransfer!.effectAllowed = 'move';
-  e.dataTransfer!.dropEffect = "move";
+  e.dataTransfer!.dropEffect = 'move';
 }
 
 function _handleDragOver(e: DragEvent) {
