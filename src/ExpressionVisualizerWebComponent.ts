@@ -10,30 +10,6 @@ import { setLocale } from './localization.js';
 import './tree-component.js';
 import './locale-picker.js';
 
-function loadScript(src: string) {
-  return new Promise((resolve: any) => {
-    const script = document.createElement('script');
-    function onLoaded() {
-      if (script.parentElement) {
-        script.parentElement.removeChild(script);
-      }
-      resolve();
-    }
-    script.src = src;
-    script.onload = onLoaded;
-
-    script.onerror = () => {
-      // eslint-disable-next-line no-console
-      console.error(
-        `[main-loader] failed to load: ${src} check the network tab for HTTP status.`
-      );
-      onLoaded();
-    };
-
-    document.head.appendChild(script);
-  });
-}
-
 // msg('+');
 // msg('-');
 // msg('*');
@@ -74,6 +50,48 @@ const funcMap = new Map();
 funcMap.set('equalText', true);
 
 let that: any = null;
+
+// 缓存一下
+let _scope: any = null;
+function _getScope(variables: {
+  name: string;
+  test: string | number | boolean;
+}[]) {
+  if (_scope) return _scope;
+
+  const scope: any = {};
+  for (let i = 0; i < variables.length; i += 1) {
+    const variable = variables[i];
+    scope[variable.name] = variable.test;
+  }
+  _scope = scope;
+
+  return _scope;
+}
+
+function _loadScript(src: string) {
+  return new Promise((resolve: any) => {
+    const script = document.createElement('script');
+    function onLoaded() {
+      if (script.parentElement) {
+        script.parentElement.removeChild(script);
+      }
+      resolve();
+    }
+    script.src = src;
+    script.onload = onLoaded;
+
+    script.onerror = () => {
+      // eslint-disable-next-line no-console
+      console.error(
+        `[main-loader] failed to load: ${src} check the network tab for HTTP status.`
+      );
+      onLoaded();
+    };
+
+    document.head.appendChild(script);
+  });
+}
 
 function _node2Blocks(node: any) {
   let blocks: MathNode[] = [];
@@ -347,12 +365,9 @@ export class ExpressionVisualizerWebComponent extends LitElement {
   private _evaluate() {
     if (!this.expression) this.result = '';
 
-    this.result = (window as any).math.evaluate(this.expression, {
-      variable1: 1,
-      variable2: true,
-      variable3: false,
-      variable4: 'abc',
-    });
+    const scope = _getScope(this.variables);
+
+    this.result = (window as any).math.evaluate(this.expression, scope);
   }
 
   private _getBlock() {
@@ -408,7 +423,7 @@ export class ExpressionVisualizerWebComponent extends LitElement {
   private _init() {
     // math
     if (!(window as any).math) {
-      loadScript('https://unpkg.com/mathjs@11.8.0/lib/browser/math.js').then(
+      _loadScript('https://unpkg.com/mathjs@11.8.0/lib/browser/math.js').then(
         () => {
           // eslint-disable-next-line no-console
           console.log('---- math loaded', !!(window as any).math);

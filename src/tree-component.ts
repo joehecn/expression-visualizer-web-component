@@ -9,6 +9,7 @@ function _handleDragStart(e: DragEvent) {
   const { id } = e.target! as HTMLElement;
   e.dataTransfer!.setData('text/plain', id);
   e.dataTransfer!.effectAllowed = 'move';
+  e.dataTransfer!.dropEffect = "move";
 }
 
 function _handleDragOver(e: DragEvent) {
@@ -29,7 +30,7 @@ export class TreeComponent extends LitElement {
       display: inline-block;
       border: 1px solid #ccc;
     }
-    .block:not(.unknown):hover {
+    .block:not(.unknown):not(:has(:hover)):hover {
       border: 1px solid blue;
       cursor: move;
     }
@@ -37,6 +38,7 @@ export class TreeComponent extends LitElement {
     .block.unknown {
       border: 1px solid red;
       color: transparent;
+      user-select: none;
     }
 
     .draggable {
@@ -56,6 +58,8 @@ export class TreeComponent extends LitElement {
       padding: 0 2px;
       font-family: monospace;
       font-size: 16px;
+      user-select: none;
+      pointer-events: none;
     }
   `;
 
