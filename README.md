@@ -2,6 +2,9 @@
 
 [![codecov](https://codecov.io/gh/joehecn/expression-visualizer-web-component/branch/main/graph/badge.svg?token=XVVTCISZZQ)](https://codecov.io/gh/joehecn/expression-visualizer-web-component)
 
+## Demo
+[storybook](https://joehecn.github.io/expression-visualizer-web-component/)
+
 This webcomponent follows the [open-wc](https://github.com/open-wc/open-wc) recommendation.
 
 ## Installation
@@ -88,10 +91,16 @@ npx lit-localize extract
 npx lit-localize build
 ```
 
+# npm publish
+```bash
+npm version patch # Bumping a new version
+```
+
 ## TODO
 - [x] localization
 - [x] storybook
 - [x] github
 - [x] codecov
-- [ ] npm
+- [x] github pages
+- [x] npm publish
 - [ ] tests
