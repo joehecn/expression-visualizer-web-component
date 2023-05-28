@@ -149,14 +149,18 @@ function _handleDrop(e: DragEvent) {
   });
 
   // e.target 一定是class="expression-visualizer" 的 div
-  that.blocks = [node!, ...that.blocks];
+  // that.blocks = [node!, ...that.blocks];
+  that.blocks = [...that.blocks, node!];
   // console.log(JSON.stringify(that.blocks, null, 2))
 
   // 手动触发更新
   // that.requestUpdate();
 
   // 表达式
-  that._generateExpression();
+  // that._generateExpression();
+
+  // 下面的代码是为了手动触发更新
+  that._triggerUpdate();
 }
 
 function _handleKeydown(e: KeyboardEvent) {
@@ -420,6 +424,31 @@ export class ExpressionVisualizerWebComponent extends LitElement {
     }
   }
 
+  private _triggerUpdate() {
+    // 在列表前面插入一个 UNKNOWN, setTimeout后再删除
+    this.blocks = [
+      {
+        type: 'ConstantNode',
+        value: 'U',
+        uuid: uuidv4(),
+        isUnknown: true,
+        // path: 'args[0]',
+        // index: 0,
+      },
+      ...this.blocks,
+    ];
+    // 手动触发更新
+    // this.requestUpdate();
+    setTimeout(() => {
+      this.blocks = this.blocks.filter((_, i) => i !== 0);
+      // 手动触发更新
+      // this.requestUpdate();
+
+      // 表达式
+      this._generateExpression();
+    });
+  }
+
   private _changedHandler(e: CustomEvent) {
     e.preventDefault();
 
@@ -463,28 +492,7 @@ export class ExpressionVisualizerWebComponent extends LitElement {
     // console.log(JSON.stringify(this.blocks, null, 2))
 
     // 下面的代码是为了手动触发更新
-    // 在列表前面插入一个 UNKNOWN, setTimeout后再删除
-    this.blocks = [
-      {
-        type: 'ConstantNode',
-        value: 'U',
-        uuid: uuidv4(),
-        isUnknown: true,
-        path,
-        index,
-      },
-      ...this.blocks,
-    ];
-    // 手动触发更新
-    // this.requestUpdate();
-    setTimeout(() => {
-      this.blocks = this.blocks.filter((_, i) => i !== 0);
-      // 手动触发更新
-      // this.requestUpdate();
-
-      // 表达式
-      this._generateExpression();
-    });
+    this._triggerUpdate();
   }
 
   private _deleteBlock(index: number) {

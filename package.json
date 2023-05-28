@@ -2,7 +2,20 @@
   "name": "expression-visualizer-web-component",
   "description": "Webcomponent expression-visualizer-web-component following open-wc recommendations",
   "license": "MIT",
-  "author": "expression-visualizer-web-component",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/joehecn/expression-visualizer-web-component.git"
+  },
+  "bugs": {
+    "url": "https://github.com/joehecn/expression-visualizer-web-component/issues"
+  },
+  "homepage": "https://github.com/joehecn/expression-visualizer-web-component#readme",
+  "keywords": [
+    "Webcomponent",
+    "expression",
+    "mathjs"
+  ],
+  "author": "leanbrown@live.cn",
   "version": "0.0.1",
   "main": "dist/src/index.js",
   "module": "dist/src/index.js",
