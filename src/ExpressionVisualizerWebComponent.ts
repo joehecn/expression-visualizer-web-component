@@ -5,7 +5,7 @@ import { map } from 'lit/directives/map.js';
 import { msg, localized } from '@lit/localize';
 import { MathNode } from './type.js';
 
-import { setLocale } from './localization.js';
+import { getLocale, setLocale } from './localization.js';
 
 import './tree-component.js';
 import './locale-picker.js';
@@ -192,10 +192,10 @@ function _handleKeydown(e: KeyboardEvent) {
 @localized()
 export class ExpressionVisualizerWebComponent extends LitElement {
   static styles = css`
-    .local-picker {
+    .locale-picker {
       padding: 8px 0;
     }
-    .hidden.local-picker {
+    .hidden.locale-picker {
       display: none;
     }
 
@@ -315,7 +315,7 @@ export class ExpressionVisualizerWebComponent extends LitElement {
   @state()
   result: any = null;
 
-  @query('#newconstant')
+  @query('#newconstant-input')
   input!: HTMLInputElement;
 
   private _block2Node(block: MathNode, ctx: any) {
@@ -365,7 +365,10 @@ export class ExpressionVisualizerWebComponent extends LitElement {
   }
 
   private _evaluate() {
-    if (!this.expression) this.result = '';
+    if (!this.expression) {
+      this.result = '';
+      return;
+    }
 
     const scope = _getScope(this.variables);
 
@@ -659,6 +662,10 @@ export class ExpressionVisualizerWebComponent extends LitElement {
     };
   }
 
+  getResult() {
+    return this.result;
+  }
+
   connectedCallback() {
     super.connectedCallback();
     that = this;
@@ -675,8 +682,8 @@ export class ExpressionVisualizerWebComponent extends LitElement {
     return html`
       <div
         class=${this.hiddenlocalepicker
-          ? 'hidden local-picker'
-          : 'local-picker'}
+          ? 'hidden locale-picker'
+          : 'locale-picker'}
       >
         <locale-picker></locale-picker>
       </div>
@@ -686,13 +693,18 @@ export class ExpressionVisualizerWebComponent extends LitElement {
         <span class="block">${this.result}</span>
       </div>
       <div class="tools">
-        <input id="newconstant" placeholder=${msg('Enter a constant')} />
-        <button @click=${this._addConstantNode}>${msg('Add constant')}</button>
+        <input id="newconstant-input" placeholder=${msg('Enter a constant')} />
+        <button id="addconstant-btn" @click=${this._addConstantNode}>
+          ${msg('Add constant')}
+        </button>
         <span class="split-group"></span>
         ${map(
           this.operators.filter(operator => operatorMap.has(operator.name)),
           operator => html`
-            <button @click=${this._addOperatorNode(operator.name)}>
+            <button
+              .id=${`${operatorMap.get(operator.name)}-btn`}
+              @click=${this._addOperatorNode(operator.name)}
+            >
               ${msg(operator.name)}
             </button>
           `
@@ -731,7 +743,11 @@ export class ExpressionVisualizerWebComponent extends LitElement {
               @changed=${this._changedHandler}
               .block=${block}
             ></tree-component>
-            <button style="height: 26px;" @click=${this._deleteBlock(index)}>
+            <button
+              class="delete-btn"
+              style="height: 26px;"
+              @click=${this._deleteBlock(index)}
+            >
               ${msg('Delete')}
             </button>
             <br />
@@ -740,4 +756,9 @@ export class ExpressionVisualizerWebComponent extends LitElement {
       </div>
     `;
   }
+}
+
+// for test
+export function getLanguage() {
+  return getLocale();
 }

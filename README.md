@@ -104,3 +104,6 @@ npm version patch # Bumping a new version
 - [x] github pages
 - [x] npm publish
 - [ ] tests
+- [ ] vue
+- [ ] angular
+- [ ] react
