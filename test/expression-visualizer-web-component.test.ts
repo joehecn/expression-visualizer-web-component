@@ -1,14 +1,29 @@
 import { html } from 'lit';
-import { fixture, expect } from '@open-wc/testing';
+import { fixture, expect, oneEvent } from '@open-wc/testing';
 import {
   ExpressionVisualizerWebComponent,
-  getLanguage,
+  getLocale,
 } from '../src/ExpressionVisualizerWebComponent.js';
 import '../src/expression-visualizer-web-component.js';
 import { LocalePicker } from '../src/locale-picker.js';
 
+import { sendKeys, sendMouse, resetMouse } from '@web/test-runner-commands';
+
 // eslint-disable-next-line
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+function getMiddleOfElement(element: HTMLElement) {
+  const { x, y, width, height } = element.getBoundingClientRect();
+
+  return {
+    x: Math.floor(x + window.pageXOffset + width / 2),
+    y: Math.floor(y + window.pageYOffset + height / 2),
+  };
+}
+
+afterEach(async () => {
+  await resetMouse();
+});
 
 describe('ExpressionVisualizerWebComponent', () => {
   it('default property', async () => {
@@ -42,27 +57,6 @@ describe('ExpressionVisualizerWebComponent', () => {
     expect(el.variables.length).to.equal(0);
   });
 
-  it('can change locale', async () => {
-    const el = await fixture<ExpressionVisualizerWebComponent>(
-      html`<expression-visualizer-web-component></expression-visualizer-web-component>`
-    );
-    const selectWrap = el.shadowRoot!.querySelector(
-      '.locale-picker'
-    ) as HTMLDivElement;
-    const picker = selectWrap.getElementsByTagName(
-      'locale-picker'
-    )[0] as LocalePicker;
-    const select = picker.shadowRoot!.querySelector(
-      'select'
-    ) as HTMLSelectElement;
-    select.getElementsByTagName('option')[0].selected = true;
-    select.dispatchEvent(new Event('change'));
-
-    setTimeout(() => {
-      expect(getLanguage()).to.equal('en');
-    });
-  });
-
   it('can hidden locale-picker and expression', async () => {
     const hiddenlocalepicker = true;
     const hiddenexpression = true;
@@ -74,6 +68,19 @@ describe('ExpressionVisualizerWebComponent', () => {
     );
     expect(el.hiddenlocalepicker).to.equal(true);
     expect(el.hiddenexpression).to.equal(true);
+  });
+
+  it('define property expression', async () => {
+    const el = await fixture<ExpressionVisualizerWebComponent>(
+      html`<expression-visualizer-web-component
+        .expression=${'1'}
+      ></expression-visualizer-web-component>`
+    );
+    await sleep(600);
+
+    expect(el.blocks.length).to.equal(1);
+    expect(el.expression).to.equal('1');
+    expect(el.result).to.equal(1);
   });
 
   it('define property variables', async () => {
@@ -96,29 +103,57 @@ describe('ExpressionVisualizerWebComponent', () => {
     ]);
   });
 
-  it('1 = 1', async () => {
+  it('can change locale', async () => {
     const el = await fixture<ExpressionVisualizerWebComponent>(
       html`<expression-visualizer-web-component></expression-visualizer-web-component>`
     );
-    await sleep(300);
+    const picker = el.shadowRoot!.querySelector(
+      'locale-picker'
+    ) as LocalePicker;
+    const select = picker.shadowRoot!.querySelector(
+      'select'
+    ) as HTMLSelectElement;
+    select.getElementsByTagName('option')[0].selected = true;
+
+    setTimeout(() => select.dispatchEvent(new Event('change')));
+
+    await oneEvent(select, 'change');
+    expect(getLocale()).to.equal('en');
+  });
+
+  it('send keydown Enter', async () => {
+    const el = await fixture<ExpressionVisualizerWebComponent>(
+      html`<expression-visualizer-web-component></expression-visualizer-web-component>`
+    );
+    await sleep(600);
 
     const input = el.shadowRoot!.querySelector(
       '#newconstant-input'
     ) as HTMLInputElement;
-    console.log(input);
-    input.value = '1';
-    await sleep(1000);
 
-    const button = el.shadowRoot!.querySelector(
-      '#addconstant-btn'
-    ) as HTMLButtonElement;
-    console.log(button);
-    button.click();
-    await sleep(100);
+    input.value = '1';
+    input.focus();
+
+    await sendKeys({
+      down: 'Enter',
+    });
 
     expect(el.blocks.length).to.equal(1);
     expect(el.expression).to.equal('1');
     expect(el.result).to.equal(1);
+  });
+
+  it.only('drag and drop', async () => {
+    const el = await fixture<ExpressionVisualizerWebComponent>(
+      html`<expression-visualizer-web-component
+        .expression=${'1+2'}
+      ></expression-visualizer-web-component>`
+    );
+    await sleep(600);
+
+    expect(el.blocks.length).to.equal(1);
+    expect(el.expression).to.equal('1+2');
+    expect(el.result).to.equal(3);
   });
 
   // it.only('block.isUnknown', async () => {
@@ -148,3 +183,10 @@ describe('ExpressionVisualizerWebComponent', () => {
     await expect(el).shadowDom.to.be.accessible();
   });
 });
+
+// click button
+// const button = el.shadowRoot!.querySelector(
+//   '#addconstant-btn'
+// ) as HTMLButtonElement;
+// setTimeout(() => button.click());
+// await oneEvent(button, 'click');

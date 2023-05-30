@@ -5,28 +5,10 @@ import { map } from 'lit/directives/map.js';
 import { msg, localized } from '@lit/localize';
 import { MathNode } from './type.js';
 
-import { getLocale, setLocale } from './localization.js';
+import { setLocale } from './localization.js';
 
 import './tree-component.js';
 import './locale-picker.js';
-
-// msg('+');
-// msg('-');
-// msg('*');
-// msg('/');
-// msg('>');
-
-// msg('<');
-// msg('>=');
-// msg('<=');
-// msg('==');
-// msg('!=');
-
-// msg('and');
-// msg('or');
-// msg('xor');
-// msg('not');
-// msg('equalText');
 
 const operatorMap = new Map();
 operatorMap.set('+', 'add');
@@ -179,6 +161,7 @@ function _handleDrop(e: DragEvent) {
   // 表达式
   // that._generateExpression();
 
+  // TODO: 怎么自动触发更新?
   // 下面的代码是为了手动触发更新
   that._triggerUpdate();
 }
@@ -444,6 +427,8 @@ export class ExpressionVisualizerWebComponent extends LitElement {
     }
   }
 
+  // TODO: 怎么自动触发更新?
+  // 下面的代码是为了手动触发更新
   private _triggerUpdate() {
     // 在列表前面插入一个 UNKNOWN, setTimeout后再删除
     this.blocks = [
@@ -511,6 +496,7 @@ export class ExpressionVisualizerWebComponent extends LitElement {
 
     // console.log(JSON.stringify(this.blocks, null, 2))
 
+    // TODO: 怎么自动触发更新?
     // 下面的代码是为了手动触发更新
     this._triggerUpdate();
   }
@@ -662,10 +648,6 @@ export class ExpressionVisualizerWebComponent extends LitElement {
     };
   }
 
-  getResult() {
-    return this.result;
-  }
-
   connectedCallback() {
     super.connectedCallback();
     that = this;
@@ -758,7 +740,4 @@ export class ExpressionVisualizerWebComponent extends LitElement {
   }
 }
 
-// for test
-export function getLanguage() {
-  return getLocale();
-}
+export { getLocale } from './localization.js';

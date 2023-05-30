@@ -3,7 +3,7 @@
 [![codecov](https://codecov.io/gh/joehecn/expression-visualizer-web-component/branch/main/graph/badge.svg?token=XVVTCISZZQ)](https://codecov.io/gh/joehecn/expression-visualizer-web-component)
 
 ## Demo
-[storybook](https://joehecn.github.io/expression-visualizer-web-component/)
+[storybook](https://joehecn.github.io/expression-visualizer-web-component/iframe.html?id=expressionvisualizerwebcomponent--regular&args=&viewMode=story)
 
 This webcomponent follows the [open-wc](https://github.com/open-wc/open-wc) recommendation.
 
