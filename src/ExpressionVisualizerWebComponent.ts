@@ -408,23 +408,21 @@ export class ExpressionVisualizerWebComponent extends LitElement {
     return { node: null, parent: null };
   }
 
-  private _init() {
+  private async _init() {
     // math
     if (!(window as any).math) {
-      _loadScript('https://unpkg.com/mathjs@11.8.0/lib/browser/math.js').then(
-        () => {
-          // eslint-disable-next-line no-console
-          console.log('---- math loaded', !!(window as any).math);
-
-          if (!this.expression) return;
-
-          const node = (window as any).math.parse(this.expression);
-          this.blocks = _node2Blocks(node);
-
-          this._evaluate();
-        }
-      );
+      await _loadScript('https://unpkg.com/mathjs@11.8.0/lib/browser/math.js');
     }
+
+    const hasMath = !!(window as any).math;
+
+    if (this.expression) {
+      const node = (window as any).math.parse(this.expression);
+      this.blocks = _node2Blocks(node);
+      this._evaluate();
+    }
+
+    return hasMath;
   }
 
   // TODO: 怎么自动触发更新?
@@ -651,7 +649,18 @@ export class ExpressionVisualizerWebComponent extends LitElement {
   connectedCallback() {
     super.connectedCallback();
     that = this;
-    this._init();
+
+    this._init().then((hasMath: boolean) => {
+      const detail = { hasMath };
+      const event = new CustomEvent('expression-inited', {
+        detail,
+        bubbles: true,
+        composed: true,
+        cancelable: true,
+      });
+      this.dispatchEvent(event);
+    });
+
     this.addEventListener('keydown', _handleKeydown);
   }
 
