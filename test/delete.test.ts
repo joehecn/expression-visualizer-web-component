@@ -1,4 +1,4 @@
-// npm test dist/test/operator-not.test.js
+// npm test dist/test/delete.test.js
 
 import { html } from 'lit';
 import {
@@ -11,17 +11,17 @@ import { resetMouse } from '@web/test-runner-commands';
 import { ExpressionVisualizerWebComponent } from '../src/ExpressionVisualizerWebComponent.js';
 import '../src/expression-visualizer-web-component.js';
 
-import { sleep, triggerDragAndDrop } from './test-helper.js';
+import { sleep } from './test-helper.js';
 
 afterEach(async () => {
   await resetMouse();
 });
 
-describe('operator not', function t() {
+describe('delete', function t() {
   this.timeout(0);
 
   it('not', async () => {
-    const expression = '(1)*(2+3)>0 and equalText(variable4, "abc")';
+    const expression = '1';
     const variables = [
       { name: 'variable1', test: 1 },
       { name: 'variable2', test: true },
@@ -41,10 +41,8 @@ describe('operator not', function t() {
     await sleep(300);
 
     expect(el.blocks.length).to.equal(1);
-    expect(el.expression).to.equal(
-      '(1)*(2+3)>0 and equalText(variable4, "abc")'
-    );
-    expect(el.result).to.equal(true);
+    expect(el.expression).to.equal('1');
+    expect(el.result).to.equal(1);
 
     // click button
     const button = el.shadowRoot!.querySelector(
@@ -54,25 +52,14 @@ describe('operator not', function t() {
     await oneEvent(button, 'click');
     await sleep(600);
 
-    // drag and drop
-    const [targetFather, sourceFather] = Array.from(
-      el.shadowRoot!.querySelectorAll('tree-component')
-    );
-    console.log({ targetFather, sourceFather });
-    const targetChild =
-      targetFather!.shadowRoot!.querySelector('tree-component');
-    const target = targetChild!.shadowRoot!.querySelector('span');
-    const source = sourceFather!.shadowRoot!.querySelector('span');
-
-    console.log({ source, target });
-
-    triggerDragAndDrop(source!, target!);
+    // delete
+    const deleteBtn = el.shadowRoot!.querySelector(
+      '.delete-btn'
+    ) as HTMLButtonElement;
+    setTimeout(() => deleteBtn.click());
+    await oneEvent(deleteBtn, 'click');
     await sleep(600);
 
-    expect(el.blocks.length).to.equal(1);
-    expect(el.expression).to.equal(
-      'not (1 * (2 + 3) > 0 and equalText(variable4, "abc"))'
-    );
-    expect(el.result).to.equal(false);
+    expect(el.result).to.equal(1);
   });
 });

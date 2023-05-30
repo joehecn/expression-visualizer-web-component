@@ -104,6 +104,10 @@ npm version patch # Bumping a new version
 - [x] github pages
 - [x] npm publish
 - [ ] tests
+- [ ] properties form helper
+- [ ] tree component requestUpdate
+- [ ] after double click edit constent
 - [ ] vue
 - [ ] angular
 - [ ] react
+- [ ] think about the tree structure

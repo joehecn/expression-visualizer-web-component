@@ -18,7 +18,7 @@
 
     const hiddenexpression = false;
 
-    const expression = '' // '(1)*(2+3)>0 and equalText(variable4, "abc")';
+    const expression = '';
 
     const operators = [
       { name: '+' },
@@ -58,143 +58,7 @@
       console.log({ hasMath: e.detail.hasMath });
     }
 
-    // const triggerDragAndDrop = (elemDrag, elemDrop, offsetY = 0) => {
-    //   const DELAY_INTERVAL_MS = 10;
-    //   const MAX_TRIES = 10;
-    //   let dragStartEvent;
-
-    //   const fireDragEvent = (type, elem, clientX, clientY, dataTransfer) => {
-    //     const event = new DragEvent(type, {
-    //       bubbles: true,
-    //       cancelable: true,
-    //       view: window,
-    //       clientX,
-    //       clientY,
-    //       screenX: clientX,
-    //       screenY: clientY,
-    //       relatedTarget: elem,
-    //       dataTransfer: dataTransfer || new DataTransfer()
-    //     });
-
-    //     elem.dispatchEvent(event);
-    //     return event;
-    //   }
-    //   const firePointerEvent = (type, elem, clientX, clientY) => {
-    //     const event = new PointerEvent(type, {
-    //       bubbles: true,
-    //       cancelable: true,
-    //       view: window,
-    //       screenX: clientX,
-    //       screenY: clientY,
-    //       button: 0,
-    //       which: 1
-    //     });
-    //     event.preventDefault()
-    //     elem.dispatchEvent(event)
-    //   }
-    //   const firePointerMoveEvent = (type, elem, clientX, clientY) => {
-    //     const event = new PointerEvent(type, {
-    //       bubbles: true,
-    //       cancelable: true,
-    //       view: window,
-    //       screenX: clientX,
-    //       screenY: clientY,
-    //     });
-    //     event.preventDefault()
-    //     elem.dispatchEvent(event)
-    //   }
-    //   const fireMouseMoveEvent = (type, elem, clientX, clientY) => {
-    //     const event = new MouseEvent(type, {
-    //       bubbles: true,
-    //       cancelable: true,
-    //       view: window,
-    //       screenX: clientX,
-    //       screenY: clientY,
-    //     });
-    //     event.preventDefault()
-    //     elem.dispatchEvent(event)
-    //   }
-    //   const fireMouseEvent = (type, elem, clientX, clientY) => {
-    //     const event = new MouseEvent(type, {
-    //       bubbles: true,
-    //       cancelable: true,
-    //       button: 0,
-    //       view: window,
-    //       screenX: clientX,
-    //       screenY: clientY,
-    //       which: 1
-    //     });
-    //     event.preventDefault()
-    //     elem.dispatchEvent(event)
-    //   }
-
-    //   // fetch target elements
-    //   if (!elemDrag || !elemDrop) return false;
-
-    //   // calculate positions
-    //   let pos = elemDrag.getBoundingClientRect()
-    //   const center1X = Math.floor((pos.left + (pos.width / 2)))
-    //   const center1Y = Math.floor((pos.top + (pos.height / 2)))
-    //   pos = elemDrop.getBoundingClientRect()
-    //   const center2X = Math.floor((pos.left + (pos.width / 2)))
-    //   const center2Y = pos.bottom
-    //   let counter = 0;
-    //   const startingDropRect = elemDrop.getBoundingClientRect();
-
-    //   const rectsEqual = (r1, r2) => r1.top === r2.top && r1.right === r2.right && r1.bottom === r2.bottom && r1.left === r2.left
-    //   const drop = () => {
-    //     console.log('DROP');
-    //     fireDragEvent("drop", elemDrop, center2X, center2Y + offsetY, dragStartEvent.dataTransfer)
-    //     fireMouseEvent("mouseup", elemDrop, center2X, center2Y + offsetY)
-    //     firePointerEvent("pointerup", elemDrop, center2X, center2Y + offsetY)
-    //   }
-    //   const dragover = () => {
-    //     counter += 1;
-    //     console.log(`DRAGOVER #${counter}`);
-
-    //     const currentDropRect = elemDrop.getBoundingClientRect();
-    //     if (rectsEqual(startingDropRect, currentDropRect) && counter < MAX_TRIES) {
-    //       if (counter !== 1) console.log("drop target rect hasn't changed, trying again");
-
-    //       fireDragEvent("dragover", elemDrop, center2X, center2Y + offsetY, dragStartEvent.dataTransfer)
-    //       fireMouseMoveEvent("mousemove", elemDrop, center2X, center2Y + offsetY)
-    //       firePointerMoveEvent("pointermove", elemDrop, center2X, center2Y + offsetY)
-    //       setTimeout(dragover, DELAY_INTERVAL_MS);
-    //     } else {
-    //       if (rectsEqual(startingDropRect, currentDropRect)) {
-    //         console.log(`wasn't able to budge drop target after ${MAX_TRIES} tries, aborting`);
-    //         fireDragEvent("drop", elemDrop, center2X, center2Y + offsetY, dragStartEvent.dataTransfer)
-    //         fireMouseEvent("mouseup", elemDrop, center2X, center2Y + offsetY)
-    //         firePointerEvent("pointerup", elemDrop, center2X, center2Y + offsetY)
-
-    //       } else {
-    //         setTimeout(drop, DELAY_INTERVAL_MS);
-    //       }
-    //       setTimeout(drop, DELAY_INTERVAL_MS);
-    //     }
-    //   }
-
-    //   // start dragging process
-    //   console.log('DRAGSTART');
-
-    //   firePointerEvent("pointerdown", elemDrag, center1X, center1Y);
-    //   fireMouseEvent("mousedown", elemDrag, center1X, center1Y)
-    //   dragStartEvent = fireDragEvent("dragstart", elemDrag, center1X, center1Y)
-
-    //   setTimeout(dragover, DELAY_INTERVAL_MS);
-    //   return true
-    // }
-    // const mockDrag = () => {
-    //   const el = document.querySelector('expression-visualizer-web-component');
-    //   const target = el.shadowRoot.querySelector('.expression-visualizer');
-    //   const father = el.shadowRoot.querySelector('tree-component');
-    //   const child = father.shadowRoot.querySelector('tree-component');
-    //   const source = child.shadowRoot.querySelector('span');
-    //   triggerDragAndDrop(source, target)
-    // }
-
     render(
-      // <button @click=${mockDrag}>Drag</button>
       html`
         <expression-visualizer-web-component
           .locale=${locale}

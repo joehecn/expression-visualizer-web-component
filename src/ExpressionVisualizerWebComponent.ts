@@ -7,6 +7,8 @@ import { MathNode } from './type.js';
 
 import { setLocale } from './localization.js';
 
+import { loadScript } from './load-script.js';
+
 import './tree-component.js';
 import './locale-picker.js';
 
@@ -53,29 +55,29 @@ function _getScope(
   return scope;
 }
 
-function _loadScript(src: string) {
-  return new Promise((resolve: any) => {
-    const script = document.createElement('script');
-    function onLoaded() {
-      if (script.parentElement) {
-        script.parentElement.removeChild(script);
-      }
-      resolve();
-    }
-    script.src = src;
-    script.onload = onLoaded;
+// function _loadScript(src: string) {
+//   return new Promise((resolve: any) => {
+//     const script = document.createElement('script');
+//     function onLoaded() {
+//       if (script.parentElement) {
+//         script.parentElement.removeChild(script);
+//       }
+//       resolve();
+//     }
+//     script.src = src;
+//     script.onload = onLoaded;
 
-    script.onerror = () => {
-      // eslint-disable-next-line no-console
-      console.error(
-        `[main-loader] failed to load: ${src} check the network tab for HTTP status.`
-      );
-      onLoaded();
-    };
+//     script.onerror = () => {
+//       // eslint-disable-next-line no-console
+//       console.error(
+//         `[main-loader] failed to load: ${src} check the network tab for HTTP status.`
+//       );
+//       onLoaded();
+//     };
 
-    document.head.appendChild(script);
-  });
-}
+//     document.head.appendChild(script);
+//   });
+// }
 
 function _node2Blocks(node: any) {
   let blocks: MathNode[] = [];
@@ -408,23 +410,6 @@ export class ExpressionVisualizerWebComponent extends LitElement {
     return { node: null, parent: null };
   }
 
-  private async _init() {
-    // math
-    if (!(window as any).math) {
-      await _loadScript('https://unpkg.com/mathjs@11.8.0/lib/browser/math.js');
-    }
-
-    const hasMath = !!(window as any).math;
-
-    if (this.expression) {
-      const node = (window as any).math.parse(this.expression);
-      this.blocks = _node2Blocks(node);
-      this._evaluate();
-    }
-
-    return hasMath;
-  }
-
   // TODO: 怎么自动触发更新?
   // 下面的代码是为了手动触发更新
   private _triggerUpdate() {
@@ -647,11 +632,28 @@ export class ExpressionVisualizerWebComponent extends LitElement {
     };
   }
 
+  async init() {
+    // math
+    if (!(window as any).math) {
+      await loadScript('https://unpkg.com/mathjs@11.8.0/lib/browser/math.js');
+    }
+
+    const hasMath = !!(window as any).math;
+
+    if (this.expression) {
+      const node = (window as any).math.parse(this.expression);
+      this.blocks = _node2Blocks(node);
+      this._evaluate();
+    }
+
+    return hasMath;
+  }
+
   connectedCallback() {
     super.connectedCallback();
     that = this;
 
-    this._init().then((hasMath: boolean) => {
+    this.init().then((hasMath: boolean) => {
       const detail = { hasMath };
       const event = new CustomEvent('expression-inited', {
         detail,
@@ -705,7 +707,10 @@ export class ExpressionVisualizerWebComponent extends LitElement {
         ${map(
           this.funcs.filter(func => funcMap.has(func.name)),
           func => html`
-            <button @click=${this._addFunctionNode(func.name)}>
+            <button
+              .id=${`${func.name}-btn`}
+              @click=${this._addFunctionNode(func.name)}
+            >
               ${msg(func.name)}
             </button>
           `
@@ -714,7 +719,10 @@ export class ExpressionVisualizerWebComponent extends LitElement {
         ${map(
           this.variables,
           variable => html`
-            <button @click=${this._addSymbolNode(variable.name)}>
+            <button
+              .id=${`${variable.name}-btn`}
+              @click=${this._addSymbolNode(variable.name)}
+            >
               ${variable.name} = ${variable.test}
             </button>
           `

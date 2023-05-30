@@ -1,4 +1,4 @@
-// npm test dist/test/send-keydown.test.js
+// npm test dist/test/string-true.test.js
 
 import { html } from 'lit';
 import {
@@ -13,8 +13,10 @@ import '../src/expression-visualizer-web-component.js';
 
 import { sleep } from './test-helper.js';
 
-describe('send keydown', () => {
-  it('Enter', async () => {
+describe('string true', function t() {
+  this.timeout(0);
+
+  it('true', async () => {
     const el = await fixtureSync<ExpressionVisualizerWebComponent>(
       html`<expression-visualizer-web-component></expression-visualizer-web-component>`
     );
@@ -27,7 +29,7 @@ describe('send keydown', () => {
       '#newconstant-input'
     ) as HTMLInputElement;
 
-    input.value = '1';
+    input.value = 'true';
     input.focus();
 
     await sendKeys({
@@ -35,7 +37,7 @@ describe('send keydown', () => {
     });
 
     expect(el.blocks.length).to.equal(1);
-    expect(el.expression).to.equal('1');
-    expect(el.result).to.equal(1);
+    expect(el.expression).to.equal('true');
+    expect(el.result).to.equal(true);
   });
 });

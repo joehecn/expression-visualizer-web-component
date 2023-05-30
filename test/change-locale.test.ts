@@ -1,3 +1,5 @@
+// npm test dist/test/change-locale.test.js
+
 import { html } from 'lit';
 import { fixture, expect, oneEvent } from '@open-wc/testing';
 import {

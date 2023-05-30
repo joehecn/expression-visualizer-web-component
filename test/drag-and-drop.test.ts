@@ -45,6 +45,6 @@ describe('drag and drop', function t() {
     triggerDragAndDrop(source!, target!);
     await sleep(300);
 
-    expect(2).to.equal(2);
+    expect(el.blocks.length).to.equal(2);
   });
 });

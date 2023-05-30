@@ -1,3 +1,5 @@
+// npm test dist/test/common.test.js
+
 import { html } from 'lit';
 import { fixture, expect } from '@open-wc/testing';
 import { ExpressionVisualizerWebComponent } from '../src/ExpressionVisualizerWebComponent.js';
