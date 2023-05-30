@@ -123,13 +123,7 @@ export const triggerDragAndDrop = (
   const drop = () => {
     console.log('DROP');
     if (!dragStartEvent) return;
-    fireDragEvent(
-      'drop',
-      elemDrop,
-      center2X,
-      center2Y + offsetY,
-      dragStartEvent!.dataTransfer!
-    );
+
     fireMouseEvent('mouseup', elemDrop, center2X, center2Y + offsetY);
     firePointerEvent('pointerup', elemDrop, center2X, center2Y + offsetY);
   };

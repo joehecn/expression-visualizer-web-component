@@ -34,23 +34,23 @@ funcMap.set('equalText', true);
 let that: any = null;
 
 // 缓存一下
-let _scope: any = null;
+// let _scope: any = null;
 function _getScope(
   variables: {
     name: string;
     test: string | number | boolean;
   }[]
 ) {
-  if (_scope) return _scope;
+  // if (_scope) return _scope;
 
   const scope: any = {};
   for (let i = 0; i < variables.length; i += 1) {
     const variable = variables[i];
     scope[variable.name] = variable.test;
   }
-  _scope = scope;
+  // _scope = scope;
 
-  return _scope;
+  return scope;
 }
 
 function _loadScript(src: string) {
@@ -459,6 +459,7 @@ export class ExpressionVisualizerWebComponent extends LitElement {
     // console.log(e.target);
 
     const { sourceId, targetId } = e.detail;
+    // console.log({ sourceId, targetId });
     const { node: sourceNode, parent: sourceParent } = this._findNodeAndParent(
       this.blocks,
       sourceId
@@ -468,9 +469,9 @@ export class ExpressionVisualizerWebComponent extends LitElement {
       targetId
     );
 
-    // console.log({ sourceNode, sourceParent, targetNode, targetParent })
+    // console.log({ sourceNode, sourceParent, targetNode, targetParent });
     const { path, index } = sourceNode!;
-    // console.log({ path, index })
+    // console.log({ path, index });
 
     sourceNode!.path = targetNode!.path;
     sourceNode!.index = targetNode!.index;

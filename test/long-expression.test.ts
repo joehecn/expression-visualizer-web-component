@@ -1,3 +1,5 @@
+// npm test dist/test/long-expression.test.js
+
 import { html } from 'lit';
 import {
   expect,
@@ -11,8 +13,8 @@ import '../src/expression-visualizer-web-component.js';
 import { sleep } from './test-helper.js';
 
 describe('define properties', () => {
-  it('1', async () => {
-    const expression = 'equalText(variable4, "abc")';
+  it('long expression', async () => {
+    const expression = '(1)*(2+3)>0 and equalText(variable4, "abc")';
     const variables = [
       { name: 'variable1', test: 1 },
       { name: 'variable2', test: true },
@@ -32,7 +34,9 @@ describe('define properties', () => {
     await sleep(300);
 
     expect(el.blocks.length).to.equal(1);
-    expect(el.expression).to.equal('equalText(variable4, "abc")');
+    expect(el.expression).to.equal(
+      '(1)*(2+3)>0 and equalText(variable4, "abc")'
+    );
     expect(el.result).to.equal(true);
   });
 });

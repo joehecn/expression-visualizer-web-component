@@ -1,3 +1,5 @@
+// npm test dist/test/operator-not.test.js
+
 import { html } from 'lit';
 import {
   expect,
@@ -15,13 +17,22 @@ afterEach(async () => {
   await resetMouse();
 });
 
-describe.skip('drag and drop', function t() {
+describe('operator not', function t() {
   this.timeout(0);
 
-  it('1+2', async () => {
+  it('not', async () => {
+    const expression = '(1)*(2+3)>0 and equalText(variable4, "abc")';
+    const variables = [
+      { name: 'variable1', test: 1 },
+      { name: 'variable2', test: true },
+      { name: 'variable3', test: false },
+      { name: 'variable4', test: 'abc' },
+    ];
+
     const el = await fixtureSync<ExpressionVisualizerWebComponent>(
       html`<expression-visualizer-web-component
-        .expression=${'1+2'}
+        .expression=${expression}
+        .variables=${variables}
       ></expression-visualizer-web-component>`
     );
     setTimeout(() => elementUpdated(el));
@@ -30,19 +41,39 @@ describe.skip('drag and drop', function t() {
     await sleep(300);
 
     expect(el.blocks.length).to.equal(1);
-    expect(el.expression).to.equal('1+2');
-    expect(el.result).to.equal(3);
+    expect(el.expression).to.equal(
+      '(1)*(2+3)>0 and equalText(variable4, "abc")'
+    );
+    expect(el.result).to.equal(true);
 
-    const target = el.shadowRoot!.querySelector('.expression-visualizer');
-    const father = el.shadowRoot!.querySelector('tree-component');
-    const child = father!.shadowRoot!.querySelector('tree-component');
-    const source = child!.shadowRoot!.querySelector('span');
+    // click button
+    const button = el.shadowRoot!.querySelector(
+      '#not-btn'
+    ) as HTMLButtonElement;
+    setTimeout(() => button.click());
+    await oneEvent(button, 'click');
+    await sleep(600);
 
-    console.log({ child, source });
+    // drag and drop
+    // const target = el.shadowRoot!.querySelector('.expression-visualizer');
+    const [targetFather, sourceFather] = Array.from(
+      el.shadowRoot!.querySelectorAll('tree-component')
+    );
+    console.log({ targetFather, sourceFather });
+    const targetChild =
+      targetFather!.shadowRoot!.querySelector('tree-component');
+    const target = targetChild!.shadowRoot!.querySelector('span');
+    const source = sourceFather!.shadowRoot!.querySelector('span');
+
+    console.log({ source, target });
 
     triggerDragAndDrop(source!, target!);
-    await sleep(300);
+    await sleep(600);
 
-    expect(2).to.equal(2);
+    expect(el.blocks.length).to.equal(1);
+    expect(el.expression).to.equal(
+      'not (1 * (2 + 3) > 0 and equalText(variable4, "abc"))'
+    );
+    expect(el.result).to.equal(false);
   });
 });

@@ -1,3 +1,5 @@
+// npm test dist/test/drag-and-drop.test.js
+
 import { html } from 'lit';
 import {
   expect,
@@ -38,7 +40,7 @@ describe('drag and drop', function t() {
     const child = father!.shadowRoot!.querySelector('tree-component');
     const source = child!.shadowRoot!.querySelector('span');
 
-    console.log({ child, source });
+    // console.log({ child, source });
 
     triggerDragAndDrop(source!, target!);
     await sleep(300);

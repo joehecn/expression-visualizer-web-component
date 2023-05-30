@@ -56,10 +56,3 @@ describe('common', () => {
     await expect(el).shadowDom.to.be.accessible();
   });
 });
-
-// click button
-// const button = el.shadowRoot!.querySelector(
-//   '#addconstant-btn'
-// ) as HTMLButtonElement;
-// setTimeout(() => button.click());
-// await oneEvent(button, 'click');
