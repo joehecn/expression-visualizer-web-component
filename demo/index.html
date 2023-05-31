@@ -10,69 +10,10 @@
 
   <script type="module">
     import { html, render } from 'lit';
-    import '../dist/src/expression-visualizer-web-component.js';
-
-    const locale = 'zh-Hant-HK';
-
-    const hiddenlocalepicker = false;
-
-    const hiddenexpression = false;
-
-    const expression = '';
-
-    const operators = [
-      { name: '+' },
-      { name: '-' },
-      { name: '*' },
-      { name: '/' },
-      { name: '>' },
-
-      { name: '<' },
-      { name: '>=' },
-      { name: '<=' },
-      { name: '==' },
-      { name: '!=' },
-
-      { name: 'and' },
-      { name: 'or' },
-      { name: 'xor' },
-      { name: 'not' }
-    ]
-
-    const funcs = [
-      { name: 'equalText' }
-    ]
-
-    const variables = [
-      { name: 'variable1', test: 1 },
-      { name: 'variable2', test: true },
-      { name: 'variable3', test: false },
-      { name: 'variable4', test: 'abc' }
-    ];
-
-    const expressionChanged = (e) => {
-      console.log({ expression: e.detail.expression });
-    }
-
-    const expressionInited = (e) => {
-      console.log({ hasMath: e.detail.hasMath });
-    }
+    import '../dist/src/helper/demo-helper.js';
 
     render(
-      html`
-        <expression-visualizer-web-component
-          .locale=${locale}
-          .hiddenlocalepicker=${hiddenlocalepicker}
-          .hiddenexpression=${hiddenexpression}
-          .expression=${expression}
-          .operators=${operators}
-          .funcs=${funcs}
-          .variables=${variables}
-          @expression-changed=${expressionChanged}
-          @expression-inited=${expressionInited}
-        >
-        </expression-visualizer-web-component>
-      `,
+      html`<demo-helper></demo-helper>`,
       document.querySelector('#demo')
     );
   </script>

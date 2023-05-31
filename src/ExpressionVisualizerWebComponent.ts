@@ -10,7 +10,6 @@ import { setLocale } from './localization.js';
 import { loadScript } from './load-script.js';
 
 import './tree-component.js';
-import './locale-picker.js';
 
 const operatorMap = new Map();
 operatorMap.set('+', 'add');
@@ -54,30 +53,6 @@ function _getScope(
 
   return scope;
 }
-
-// function _loadScript(src: string) {
-//   return new Promise((resolve: any) => {
-//     const script = document.createElement('script');
-//     function onLoaded() {
-//       if (script.parentElement) {
-//         script.parentElement.removeChild(script);
-//       }
-//       resolve();
-//     }
-//     script.src = src;
-//     script.onload = onLoaded;
-
-//     script.onerror = () => {
-//       // eslint-disable-next-line no-console
-//       console.error(
-//         `[main-loader] failed to load: ${src} check the network tab for HTTP status.`
-//       );
-//       onLoaded();
-//     };
-
-//     document.head.appendChild(script);
-//   });
-// }
 
 function _node2Blocks(node: any) {
   let blocks: MathNode[] = [];
@@ -129,6 +104,7 @@ function _handleDragOver(e: DragEvent) {
 }
 
 function _handleDrop(e: DragEvent) {
+  // console.log('---- _handleDrop')
   e.preventDefault();
 
   if (!that) return;
@@ -153,17 +129,8 @@ function _handleDrop(e: DragEvent) {
   });
 
   // e.target 一定是class="expression-visualizer" 的 div
-  // that.blocks = [node!, ...that.blocks];
   that.blocks = [...that.blocks, node!];
-  // console.log(JSON.stringify(that.blocks, null, 2))
 
-  // 手动触发更新
-  // that.requestUpdate();
-
-  // 表达式
-  // that._generateExpression();
-
-  // TODO: 怎么自动触发更新?
   // 下面的代码是为了手动触发更新
   that._triggerUpdate();
 }
@@ -177,13 +144,6 @@ function _handleKeydown(e: KeyboardEvent) {
 @localized()
 export class ExpressionVisualizerWebComponent extends LitElement {
   static styles = css`
-    .locale-picker {
-      padding: 8px 0;
-    }
-    .hidden.locale-picker {
-      display: none;
-    }
-
     .expression-visualizer {
       background-color: #eee;
       min-height: 300px;
@@ -222,6 +182,10 @@ export class ExpressionVisualizerWebComponent extends LitElement {
       display: inline-block;
       width: 8px;
     }
+
+    .err-msg {
+      color: red;
+    }
   `;
 
   @property({
@@ -229,34 +193,36 @@ export class ExpressionVisualizerWebComponent extends LitElement {
     hasChanged(newVal: string, oldVal: string) {
       const changed = newVal !== oldVal;
       // 副作用
-      setLocale(newVal).then(() => {
-        // eslint-disable-next-line no-console
-        console.log('---- locale changed');
-      });
+      if (changed) {
+        setLocale(newVal).then(() => {
+          // eslint-disable-next-line no-console
+          console.log(
+            '[expression-visualizer]: locale hasChanged:',
+            oldVal,
+            'to',
+            newVal
+          );
+        });
+      }
+
       return changed;
     },
   })
   locale = 'zh-Hant-HK';
-
-  @property({ type: Boolean }) hiddenlocalepicker = false;
 
   @property({ type: Boolean }) hiddenexpression = false;
 
   @property({
     type: String,
     hasChanged(newVal: string, oldVal: string) {
+      if (!that) return false;
+
+      // console.log({ newVal, oldVal })
       const changed = newVal !== oldVal;
 
       // 副作用
-      if (changed && oldVal !== undefined && that) {
-        const detail = { expression: newVal };
-        const event = new CustomEvent('expression-changed', {
-          detail,
-          bubbles: true,
-          composed: true,
-          cancelable: true,
-        });
-        that.dispatchEvent(event);
+      if (changed) {
+        that.setExpression(newVal);
       }
 
       return changed;
@@ -295,13 +261,34 @@ export class ExpressionVisualizerWebComponent extends LitElement {
   }[] = [];
 
   @state()
+  _expression = '';
+
+  @state()
   blocks: MathNode[] = [];
 
   @state()
   result: any = null;
 
+  @state()
+  errMsg = '';
+
   @query('#newconstant-input')
   input!: HTMLInputElement;
+
+  private _expressionChanged() {
+    const detail = {
+      expression: this._expression,
+      result: this.result,
+      errMsg: this.errMsg,
+    };
+    const event = new CustomEvent('expression-changed', {
+      detail,
+      bubbles: true,
+      composed: true,
+      cancelable: true,
+    });
+    that.dispatchEvent(event);
+  }
 
   private _block2Node(block: MathNode, ctx: any) {
     if (block.type === 'ConstantNode' && !block.isUnknown) {
@@ -350,14 +337,19 @@ export class ExpressionVisualizerWebComponent extends LitElement {
   }
 
   private _evaluate() {
-    if (!this.expression) {
+    if (!this._expression) {
       this.result = '';
       return;
     }
 
-    const scope = _getScope(this.variables);
-
-    this.result = (window as any).math.evaluate(this.expression, scope);
+    try {
+      this.errMsg = '';
+      const scope = _getScope(this.variables);
+      this.result = (window as any).math.evaluate(this._expression, scope);
+    } catch (error: any) {
+      this.result = '';
+      this.errMsg = error.message;
+    }
   }
 
   private _getBlock() {
@@ -379,12 +371,16 @@ export class ExpressionVisualizerWebComponent extends LitElement {
     // 获取 block
     const block = this._getBlock();
     if (!block) {
-      this.expression = '';
+      this._expression = '';
     } else {
-      this.expression = this._getExpression(block);
+      this._expression = this._getExpression(block);
     }
 
     this._evaluate();
+
+    if (block && this._expression) {
+      this._expressionChanged();
+    }
   }
 
   private _findNodeAndParent(
@@ -632,6 +628,19 @@ export class ExpressionVisualizerWebComponent extends LitElement {
     };
   }
 
+  setExpression(expression: string) {
+    // console.log({ expression, from })
+
+    if (this._expression === expression) return;
+    this._expression = expression;
+
+    if (this._expression) {
+      const node = (window as any).math.parse(this._expression);
+      this.blocks = _node2Blocks(node);
+      this._evaluate();
+    }
+  }
+
   async init() {
     // math
     if (!(window as any).math) {
@@ -640,11 +649,12 @@ export class ExpressionVisualizerWebComponent extends LitElement {
 
     const hasMath = !!(window as any).math;
 
-    if (this.expression) {
-      const node = (window as any).math.parse(this.expression);
-      this.blocks = _node2Blocks(node);
-      this._evaluate();
-    }
+    this.setExpression(this.expression);
+    // if (this._expression) {
+    //   const node = (window as any).math.parse(this._expression);
+    //   this.blocks = _node2Blocks(node);
+    //   this._evaluate();
+    // }
 
     return hasMath;
   }
@@ -674,15 +684,8 @@ export class ExpressionVisualizerWebComponent extends LitElement {
 
   render() {
     return html`
-      <div
-        class=${this.hiddenlocalepicker
-          ? 'hidden locale-picker'
-          : 'locale-picker'}
-      >
-        <locale-picker></locale-picker>
-      </div>
       <div class=${this.hiddenexpression ? 'hidden expression' : 'expression'}>
-        <span class="block">${this.expression}</span>
+        <span class="block">${this._expression}</span>
         <span class="equal">=</span>
         <span class="block">${this.result}</span>
       </div>
@@ -754,8 +757,10 @@ export class ExpressionVisualizerWebComponent extends LitElement {
           `;
         })}
       </div>
+      <span class="err-msg">${this.errMsg}</span>
     `;
   }
 }
 
 export { getLocale } from './localization.js';
+export { allLocales } from './generated/locale-codes.js';

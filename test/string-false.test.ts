@@ -37,7 +37,7 @@ describe('string false', function t() {
     });
 
     expect(el.blocks.length).to.equal(1);
-    expect(el.expression).to.equal('false');
+    expect(el._expression).to.equal('false');
     expect(el.result).to.equal(false);
   });
 });

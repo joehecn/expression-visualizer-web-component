@@ -41,7 +41,7 @@ describe('operator not', function t() {
     await sleep(300);
 
     expect(el.blocks.length).to.equal(1);
-    expect(el.expression).to.equal(
+    expect(el._expression).to.equal(
       '(1)*(2+3)>0 and equalText(variable4, "abc")'
     );
     expect(el.result).to.equal(true);
@@ -70,7 +70,7 @@ describe('operator not', function t() {
     await sleep(600);
 
     expect(el.blocks.length).to.equal(1);
-    expect(el.expression).to.equal(
+    expect(el._expression).to.equal(
       'not (1 * (2 + 3) > 0 and equalText(variable4, "abc"))'
     );
     expect(el.result).to.equal(false);

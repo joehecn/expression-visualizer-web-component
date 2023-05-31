@@ -37,7 +37,7 @@ describe('string true', function t() {
     });
 
     expect(el.blocks.length).to.equal(1);
-    expect(el.expression).to.equal('true');
+    expect(el._expression).to.equal('true');
     expect(el.result).to.equal(true);
   });
 });

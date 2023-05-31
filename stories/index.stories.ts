@@ -6,7 +6,6 @@ export default {
   component: 'expression-visualizer-web-component',
   argTypes: {
     locale: { control: 'text' },
-    hiddenlocalepicker: { control: 'boolean' },
     hiddenexpression: { control: 'boolean' },
     expresstion: { control: 'text' },
     operators: { control: 'object' },
@@ -23,7 +22,6 @@ interface Story<T> {
 
 interface ArgTypes {
   locale?: string;
-  hiddenlocalepicker?: boolean;
   hiddenexpression?: boolean;
   expression?: string;
   operators?: Array<{ name: string }>;
@@ -33,7 +31,6 @@ interface ArgTypes {
 
 const Template: Story<ArgTypes> = ({
   locale = 'zh-Hant-HK',
-  hiddenlocalepicker = false,
   hiddenexpression = false,
   expression = '',
   operators = [
@@ -64,7 +61,6 @@ const Template: Story<ArgTypes> = ({
 }: ArgTypes) => html`
   <expression-visualizer-web-component
     .locale=${locale}
-    .hiddenlocalepicker=${hiddenlocalepicker}
     .hiddenexpression=${hiddenexpression}
     .expression=${expression}
     .operators=${operators}

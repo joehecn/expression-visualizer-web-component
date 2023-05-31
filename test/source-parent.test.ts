@@ -32,7 +32,7 @@ describe('drag and drop', function t() {
     await sleep(300);
 
     expect(el.blocks.length).to.equal(1);
-    expect(el.expression).to.equal('not(1+2)');
+    expect(el._expression).to.equal('not(1+2)');
     expect(el.result).to.equal(false);
 
     const target1 = el.shadowRoot!.querySelector('.expression-visualizer');

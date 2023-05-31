@@ -12,9 +12,8 @@ describe('common', () => {
     );
 
     expect(el.locale).to.equal('zh-Hant-HK');
-    expect(el.hiddenlocalepicker).to.equal(false);
     expect(el.hiddenexpression).to.equal(false);
-    expect(el.expression).to.equal('');
+    expect(el._expression).to.equal('');
     expect(el.operators).to.have.deep.members([
       { name: '+' },
       { name: '-' },
@@ -38,15 +37,12 @@ describe('common', () => {
   });
 
   it('can hidden locale-picker and expression', async () => {
-    const hiddenlocalepicker = true;
     const hiddenexpression = true;
     const el = await fixture<ExpressionVisualizerWebComponent>(
       html`<expression-visualizer-web-component
-        .hiddenlocalepicker=${hiddenlocalepicker}
         .hiddenexpression=${hiddenexpression}
       ></expression-visualizer-web-component>`
     );
-    expect(el.hiddenlocalepicker).to.equal(true);
     expect(el.hiddenexpression).to.equal(true);
   });
 
