@@ -1,5 +1,6 @@
 import { html, TemplateResult } from 'lit';
-import '../src/expression-visualizer-web-component.js';
+// import '../src/expression-visualizer-web-component.js';
+import '../src/helper/demo-helper.js';
 
 export default {
   title: 'ExpressionVisualizerWebComponent',
@@ -29,46 +30,16 @@ interface ArgTypes {
   variables?: Array<{ name: string; test: any }>;
 }
 
-const Template: Story<ArgTypes> = ({
-  locale = 'zh-Hant-HK',
-  hiddenexpression = false,
-  expression = '',
-  operators = [
-    { name: '+' },
-    { name: '-' },
-    { name: '*' },
-    { name: '/' },
-    { name: '>' },
-
-    { name: '<' },
-    { name: '>=' },
-    { name: '<=' },
-    { name: '==' },
-    { name: '!=' },
-
-    { name: 'and' },
-    { name: 'or' },
-    { name: 'xor' },
-    { name: 'not' },
-  ],
-  funcs = [{ name: 'equalText' }],
-  variables = [
-    { name: 'variable1', test: 1 },
-    { name: 'variable2', test: true },
-    { name: 'variable3', test: false },
-    { name: 'variable4', test: 'abc' },
-  ],
-}: ArgTypes) => html`
-  <expression-visualizer-web-component
-    .locale=${locale}
-    .hiddenexpression=${hiddenexpression}
-    .expression=${expression}
-    .operators=${operators}
-    .funcs=${funcs}
-    .variables=${variables}
-  >
-  </expression-visualizer-web-component>
-`;
+// <expression-visualizer-web-component
+//     .locale=${locale}
+//     .hiddenexpression=${hiddenexpression}
+//     .expression=${expression}
+//     .operators=${operators}
+//     .funcs=${funcs}
+//     .variables=${variables}
+//   >
+//   </expression-visualizer-web-component>
+const Template: Story<ArgTypes> = () => html` <demo-helper></demo-helper> `;
 
 export const Regular = Template.bind({});
 
