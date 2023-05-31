@@ -25,8 +25,8 @@ describe('shot expression', () => {
 
     await sleep(300);
 
-    expect(el.blocks.length).to.equal(1);
+    expect(el._blocks.length).to.equal(1);
     expect(el._expression).to.equal('(1)');
-    expect(el.result).to.equal(1);
+    expect(el._result).to.equal(1);
   });
 });

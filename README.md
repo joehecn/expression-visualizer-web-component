@@ -103,8 +103,8 @@ npm version patch # Bumping a new version
 - [x] codecov
 - [x] github pages
 - [x] npm publish
-- [ ] tests
-- [ ] properties form helper
+- [x] tests
+- [x] properties form helper
 - [ ] tree component requestUpdate
 - [ ] after double click edit constent
 - [ ] vue

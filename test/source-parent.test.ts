@@ -31,9 +31,9 @@ describe('drag and drop', function t() {
 
     await sleep(300);
 
-    expect(el.blocks.length).to.equal(1);
+    expect(el._blocks.length).to.equal(1);
     expect(el._expression).to.equal('not(1+2)');
-    expect(el.result).to.equal(false);
+    expect(el._result).to.equal(false);
 
     const target1 = el.shadowRoot!.querySelector('.expression-visualizer');
     const father = el.shadowRoot!.querySelector('tree-component');
@@ -65,6 +65,6 @@ describe('drag and drop', function t() {
     triggerDragAndDrop(source2!, target2!);
     await sleep(300);
 
-    expect(el.blocks.length).to.equal(2);
+    expect(el._blocks.length).to.equal(2);
   });
 });

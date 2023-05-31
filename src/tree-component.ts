@@ -103,6 +103,7 @@ export class TreeComponent extends LitElement {
         `;
       }
 
+      // contenteditable="true"
       return html`
         <span
           id=${block.uuid}

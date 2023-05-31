@@ -40,11 +40,11 @@ describe('operator not', function t() {
 
     await sleep(300);
 
-    expect(el.blocks.length).to.equal(1);
+    expect(el._blocks.length).to.equal(1);
     expect(el._expression).to.equal(
       '(1)*(2+3)>0 and equalText(variable4, "abc")'
     );
-    expect(el.result).to.equal(true);
+    expect(el._result).to.equal(true);
 
     // click button
     const button = el.shadowRoot!.querySelector(
@@ -69,10 +69,10 @@ describe('operator not', function t() {
     triggerDragAndDrop(source!, target!);
     await sleep(600);
 
-    expect(el.blocks.length).to.equal(1);
+    expect(el._blocks.length).to.equal(1);
     expect(el._expression).to.equal(
       'not (1 * (2 + 3) > 0 and equalText(variable4, "abc"))'
     );
-    expect(el.result).to.equal(false);
+    expect(el._result).to.equal(false);
   });
 });

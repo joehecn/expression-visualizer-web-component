@@ -48,6 +48,6 @@ describe('func equal text', function t() {
     await oneEvent(button, 'click');
     await sleep(600);
 
-    expect(el.blocks.length).to.equal(1);
+    expect(el._blocks.length).to.equal(1);
   });
 });

@@ -36,8 +36,8 @@ describe('string false', function t() {
       down: 'Enter',
     });
 
-    expect(el.blocks.length).to.equal(1);
+    expect(el._blocks.length).to.equal(1);
     expect(el._expression).to.equal('false');
-    expect(el.result).to.equal(false);
+    expect(el._result).to.equal(false);
   });
 });

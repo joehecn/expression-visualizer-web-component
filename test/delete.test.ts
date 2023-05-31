@@ -40,9 +40,9 @@ describe('delete', function t() {
 
     await sleep(300);
 
-    expect(el.blocks.length).to.equal(1);
+    expect(el._blocks.length).to.equal(1);
     expect(el._expression).to.equal('1');
-    expect(el.result).to.equal(1);
+    expect(el._result).to.equal(1);
 
     // click button
     const button = el.shadowRoot!.querySelector(
@@ -60,6 +60,6 @@ describe('delete', function t() {
     await oneEvent(deleteBtn, 'click');
     await sleep(600);
 
-    expect(el.result).to.equal(1);
+    expect(el._result).to.equal(1);
   });
 });
