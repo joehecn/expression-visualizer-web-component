@@ -30,9 +30,7 @@ const operatorMap = new Map([
   ['not', 'not'],
 ]);
 
-const funcMap = new Map([
-  ['equalText', true],
-]);
+const funcMap = new Map([['equalText', true]]);
 
 function _getScope(
   variables: {
@@ -365,11 +363,13 @@ export class ExpressionVisualizerWebComponent extends LitElement {
     // 表达式
     this._generateExpression();
   }
+
   private _handleKeydown(e: KeyboardEvent) {
     if (e.key === 'Enter') {
       this._addConstantNode();
     }
   }
+
   // 添加运算符
   private _addOperatorNode(name: string) {
     return () => {
@@ -428,6 +428,7 @@ export class ExpressionVisualizerWebComponent extends LitElement {
       this._generateExpression();
     };
   }
+
   // 添加函数
   private _addFunctionNode(name: string) {
     return () => {
@@ -465,6 +466,7 @@ export class ExpressionVisualizerWebComponent extends LitElement {
       this._generateExpression();
     };
   }
+
   // 添加变量
   private _addSymbolNode(name: string) {
     return () => {
@@ -480,6 +482,7 @@ export class ExpressionVisualizerWebComponent extends LitElement {
       this._generateExpression();
     };
   }
+
   // 修改
   // 子组件上报事件
   // 拖拽一个表达式到另一个表达式的插槽
@@ -525,6 +528,7 @@ export class ExpressionVisualizerWebComponent extends LitElement {
     // 表达式
     this._generateExpression();
   }
+
   // 修改
   // 拖拽表达式到画布空白处
   private _handleDrop() {
@@ -538,7 +542,7 @@ export class ExpressionVisualizerWebComponent extends LitElement {
       const blocks: MathNode[] = JSON.parse(JSON.stringify(this._blocks));
 
       const id = e.dataTransfer!.getData('text/plain');
-  
+
       const { node, parent } = this._findNodeAndParent(blocks, id);
 
       // console.log({ node, parent })
@@ -561,6 +565,7 @@ export class ExpressionVisualizerWebComponent extends LitElement {
       this._generateExpression();
     };
   }
+
   // 删除 block
   private _deleteBlock(index: number) {
     return () => {
