@@ -107,7 +107,6 @@ async function _initMath() {
 export class ExpressionVisualizerWebComponent extends LitElement {
   static styles = css`
     .expression-visualizer {
-      background-color: #eee;
       min-height: 300px;
     }
     .expression {
@@ -149,6 +148,10 @@ export class ExpressionVisualizerWebComponent extends LitElement {
       color: red;
     }
   `;
+
+  @property({ type: Object }) config: { [key: string]: any } = {
+    expressionVisualizerStyle: 'background-color: #eee;',
+  };
 
   @property({ type: String }) locale = 'zh-Hant-HK';
 
@@ -694,6 +697,7 @@ export class ExpressionVisualizerWebComponent extends LitElement {
       </div>
       <div
         class="expression-visualizer"
+        style=${this.config.expressionVisualizerStyle}
         droppable="true"
         .ondragover=${_handleDragOver}
         .ondrop=${this._handleDrop()}

@@ -54,6 +54,11 @@ export class DemoHelper extends LitElement {
   `;
 
   @state()
+  private config: { [key: string]: any } = {
+    expressionVisualizerStyle: 'background-color: #eee;',
+  };
+
+  @state()
   private locale = 'zh-Hant-HK';
 
   @state()
@@ -135,6 +140,7 @@ export class DemoHelper extends LitElement {
   render() {
     return html`
       <expression-visualizer-web-component
+        .config=${this.config}
         .locale=${this.locale}
         .hiddenexpression=${this.hiddenexpression}
         .expression=${this.expression}
