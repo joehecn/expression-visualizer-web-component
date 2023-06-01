@@ -11,6 +11,21 @@ import { loadScript } from './load-script.js';
 
 import './tree-component.js';
 
+const themeMap = new Map([
+  [
+    'light',
+    {
+      expressionVisualizerStyle: 'background-color: #eee;',
+    },
+  ],
+  [
+    'dark',
+    {
+      expressionVisualizerStyle: 'background-color: #000;',
+    },
+  ],
+]);
+
 const operatorMap = new Map([
   ['+', 'add'],
   ['-', 'subtract'],
@@ -149,9 +164,7 @@ export class ExpressionVisualizerWebComponent extends LitElement {
     }
   `;
 
-  @property({ type: Object }) config: { [key: string]: any } = {
-    expressionVisualizerStyle: 'background-color: #eee;',
-  };
+  @property({ type: String }) theme: string = 'light';
 
   @property({ type: String }) locale = 'zh-Hant-HK';
 
@@ -188,6 +201,9 @@ export class ExpressionVisualizerWebComponent extends LitElement {
     name: string;
     test: string | number | boolean;
   }[] = [];
+
+  @state()
+  _curTheme = themeMap.get(this.theme);
 
   @state()
   _hasMath = false;
@@ -633,14 +649,24 @@ export class ExpressionVisualizerWebComponent extends LitElement {
       changedProperties.has('expression') ||
       changedProperties.has('_hasMath')
     ) {
-      if (!this._hasMath) return;
+      if (this._hasMath) {
+        // 每当传入表达式字符串发生变化时，都会触发这个函数
+        this._setExpression(this.expression);
+        // eslint-disable-next-line no-console
+        console.log(
+          '[expression-visualizer]: willUpdate -> expression changed:',
+          changedProperties.get('expression'),
+          this.expression
+        );
+      }
+    }
 
-      // 每当传入表达式字符串发生变化时，都会触发这个函数
-      this._setExpression(this.expression);
+    if (changedProperties.has('theme')) {
+      this._curTheme = themeMap.get(this.theme);
       // eslint-disable-next-line no-console
       console.log(
-        '[expression-visualizer]: willUpdate -> expression changed:',
-        changedProperties.get('expression'),
+        '[expression-visualizer]: willUpdate -> theme changed:',
+        changedProperties.get('theme'),
         this.expression
       );
     }
@@ -697,7 +723,7 @@ export class ExpressionVisualizerWebComponent extends LitElement {
       </div>
       <div
         class="expression-visualizer"
-        style=${this.config.expressionVisualizerStyle}
+        style=${this._curTheme!.expressionVisualizerStyle}
         droppable="true"
         .ondragover=${_handleDragOver}
         .ondrop=${this._handleDrop()}
