@@ -106,7 +106,8 @@ npm version patch # Bumping a new version
 - [x] tests
 - [x] properties form helper
 - [x] tree component requestUpdate
-- [ ] after double click edit constent
+- [ ] can edit constent (contenteditable)
+- [ ] can replace block
 - [ ] vue
 - [ ] angular
 - [ ] react

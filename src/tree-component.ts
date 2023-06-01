@@ -89,46 +89,58 @@ export class TreeComponent extends LitElement {
   }
 
   private _getTemplate(block: MathNode): TemplateResult {
-    if (block.type === 'ConstantNode') {
-      if (block.isUnknown) {
+    switch (block.type) {
+      case 'ConstantNode': {
+        if (block.isUnknown) {
+          return html`
+            <span
+              id=${block.uuid}
+              class="block unknown leaf"
+              droppable="true"
+              .ondragover=${_handleDragOver}
+              .ondrop=${this._handleDrop}
+              >${block.value}</span
+            >
+          `;
+        }
+
+        // contenteditable="true"
         return html`
           <span
             id=${block.uuid}
-            class="block unknown leaf"
-            droppable="true"
-            .ondragover=${_handleDragOver}
-            .ondrop=${this._handleDrop}
+            class="block leaf"
+            draggable="true"
+            .ondragstart=${_handleDragStart}
             >${block.value}</span
           >
         `;
       }
+      case 'SymbolNode': {
+        return html`
+          <span
+            id=${block.uuid}
+            class="block leaf"
+            draggable="true"
+            .ondragstart=${_handleDragStart}
+            >${block.name}</span
+          >
+        `;
+      }
+      case 'OperatorNode': {
+        if (block.op === 'not') {
+          return html`
+            <span
+              id=${block.uuid}
+              class="block draggable"
+              draggable="true"
+              .ondragstart=${_handleDragStart}
+            >
+              <span class="op">${block.op}</span>
+              <tree-component .block=${block.args![0]}></tree-component>
+            </span>
+          `;
+        }
 
-      // contenteditable="true"
-      return html`
-        <span
-          id=${block.uuid}
-          class="block leaf"
-          draggable="true"
-          .ondragstart=${_handleDragStart}
-          >${block.value}</span
-        >
-      `;
-    }
-
-    if (block.type === 'SymbolNode') {
-      return html`
-        <span
-          id=${block.uuid}
-          class="block leaf"
-          draggable="true"
-          .ondragstart=${_handleDragStart}
-          >${block.name}</span
-        >
-      `;
-    }
-
-    if (block.type === 'OperatorNode') {
-      if (block.op === 'not') {
         return html`
           <span
             id=${block.uuid}
@@ -136,51 +148,38 @@ export class TreeComponent extends LitElement {
             draggable="true"
             .ondragstart=${_handleDragStart}
           >
-            <span class="op">${block.op}</span>
             <tree-component .block=${block.args![0]}></tree-component>
+            <span class="op">${block.op}</span>
+            <tree-component .block=${block.args![1]}></tree-component>
           </span>
         `;
       }
-
-      return html`
-        <span
-          id=${block.uuid}
-          class="block draggable"
-          draggable="true"
-          .ondragstart=${_handleDragStart}
-        >
-          <tree-component .block=${block.args![0]}></tree-component>
-          <span class="op">${block.op}</span>
-          <tree-component .block=${block.args![1]}></tree-component>
-        </span>
-      `;
+      case 'FunctionNode': {
+        return html`
+          <span
+            id=${block.uuid}
+            class="block draggable"
+            draggable="true"
+            .ondragstart=${_handleDragStart}
+          >
+            <span class="op">${(block.fn as { name: string }).name}(</span>
+            <tree-component .block=${block.args![0]}></tree-component>
+            <span class="op">,</span>
+            <tree-component .block=${block.args![1]}></tree-component>
+            <span class="op">)</span>
+          </span>
+        `;
+      }
+      case 'ParenthesisNode': {
+        // 正常情况不会出现括号
+        // 因为转换树时会丢掉括号
+        return this._getTemplate(block.content!);
+      }
+      default: {
+        // 正常情况不会出现 UNKNOWN
+        return html` <span>UNKNOWN</span> `;
+      }
     }
-
-    if (block.type === 'FunctionNode') {
-      return html`
-        <span
-          id=${block.uuid}
-          class="block draggable"
-          draggable="true"
-          .ondragstart=${_handleDragStart}
-        >
-          <span class="op">${(block.fn as { name: string }).name}(</span>
-          <tree-component .block=${block.args![0]}></tree-component>
-          <span class="op">,</span>
-          <tree-component .block=${block.args![1]}></tree-component>
-          <span class="op">)</span>
-        </span>
-      `;
-    }
-
-    if (block.type === 'ParenthesisNode') {
-      // 正常情况不会出现括号
-      // 因为转换树时会丢掉括号
-      return this._getTemplate(block.content!);
-    }
-
-    // 正常情况不会出现 UNKNOWN
-    return html` <span>UNKNOWN</span> `;
   }
 
   render() {

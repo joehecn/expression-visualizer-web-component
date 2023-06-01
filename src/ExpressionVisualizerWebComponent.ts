@@ -11,26 +11,28 @@ import { loadScript } from './load-script.js';
 
 import './tree-component.js';
 
-const operatorMap = new Map();
-operatorMap.set('+', 'add');
-operatorMap.set('-', 'subtract');
-operatorMap.set('*', 'multiply');
-operatorMap.set('/', 'divide');
-operatorMap.set('>', 'larger');
+const operatorMap = new Map([
+  ['+', 'add'],
+  ['-', 'subtract'],
+  ['*', 'multiply'],
+  ['/', 'divide'],
+  ['>', 'larger'],
 
-operatorMap.set('<', 'smaller');
-operatorMap.set('>=', 'largerEq');
-operatorMap.set('<=', 'smallerEq');
-operatorMap.set('==', 'equal');
-operatorMap.set('!=', 'unequal');
+  ['<', 'smaller'],
+  ['>=', 'largerEq'],
+  ['<=', 'smallerEq'],
+  ['==', 'equal'],
+  ['!=', 'unequal'],
 
-operatorMap.set('and', 'and');
-operatorMap.set('or', 'or');
-operatorMap.set('xor', 'xor');
-operatorMap.set('not', 'not');
+  ['and', 'and'],
+  ['or', 'or'],
+  ['xor', 'xor'],
+  ['not', 'not'],
+]);
 
-const funcMap = new Map();
-funcMap.set('equalText', true);
+const funcMap = new Map([
+  ['equalText', true],
+]);
 
 function _getScope(
   variables: {
@@ -93,7 +95,7 @@ function _handleDragOver(e: DragEvent) {
   e.dataTransfer!.dropEffect = 'move';
 }
 
-async function _init() {
+async function _initMath() {
   // math
   if (!(window as any).math) {
     await loadScript('https://unpkg.com/mathjs@11.8.0/lib/browser/math.js');
@@ -337,60 +339,7 @@ export class ExpressionVisualizerWebComponent extends LitElement {
     return { node: null, parent: null };
   }
 
-  private _changedHandler(e: CustomEvent) {
-    e.preventDefault();
-
-    const blocks: MathNode[] = JSON.parse(JSON.stringify(this._blocks));
-
-    const { sourceId, targetId } = e.detail;
-    // console.log({ sourceId, targetId });
-    const { node: sourceNode, parent: sourceParent } = this._findNodeAndParent(
-      blocks,
-      sourceId
-    );
-    const { node: targetNode, parent: targetParent } = this._findNodeAndParent(
-      blocks,
-      targetId
-    );
-
-    // console.log({ sourceNode, sourceParent, targetNode, targetParent });
-    const { path, index } = sourceNode!;
-    // console.log({ path, index });
-
-    sourceNode!.path = targetNode!.path;
-    sourceNode!.index = targetNode!.index;
-    // console.log(targetNode!.path, targetNode!.index)
-    targetParent!.args!.splice(targetNode!.index!, 1, sourceNode!);
-
-    if (sourceParent) {
-      sourceParent!.args!.splice(index!, 1, {
-        type: 'ConstantNode',
-        value: 'U',
-        uuid: uuidv4(),
-        isUnknown: true,
-        path,
-        index,
-      });
-      this._blocks = blocks;
-    } else {
-      this._blocks = blocks.filter(block => block.uuid !== sourceNode!.uuid);
-    }
-
-    // 表达式
-    this._generateExpression();
-  }
-
-  private _deleteBlock(index: number) {
-    return () => {
-      this._blocks = this._blocks.filter((_, i) => i !== index);
-      // 手动触发更新
-      // this.requestUpdate();
-
-      // 表达式
-      this._generateExpression();
-    };
-  }
-
+  // 添加常量
   private _addConstantNode() {
     let { value }: { value: boolean | number | string } = this._input;
     if (!value) return;
@@ -416,50 +365,12 @@ export class ExpressionVisualizerWebComponent extends LitElement {
     // 表达式
     this._generateExpression();
   }
-
   private _handleKeydown(e: KeyboardEvent) {
-    // console.log(this);
     if (e.key === 'Enter') {
       this._addConstantNode();
     }
   }
-
-  private _handleDrop() {
-    return (e: DragEvent) => {
-      e.preventDefault();
-
-      // console.log("---- drop 2");
-      if ((e.target as HTMLElement).className !== 'expression-visualizer')
-        return;
-
-      const blocks: MathNode[] = JSON.parse(JSON.stringify(this._blocks));
-
-      const id = e.dataTransfer!.getData('text/plain');
-      // console.log(this);
-      // console.log(this._findNodeAndParent);
-      const { node, parent } = this._findNodeAndParent(blocks, id);
-
-      // console.log({ node, parent })
-      if (!node || !parent) return;
-
-      // 原来的位置替换为 UNKNOWN
-      parent!.args!.splice(node!.index!, 1, {
-        type: 'ConstantNode',
-        value: 'U',
-        uuid: uuidv4(),
-        isUnknown: true,
-        path: node!.path,
-        index: node!.index!,
-      });
-
-      // e.target 一定是class="expression-visualizer" 的 div
-      this._blocks = [...blocks, node!];
-
-      // 表达式
-      this._generateExpression();
-    };
-  }
-
+  // 添加运算符
   private _addOperatorNode(name: string) {
     return () => {
       let block: MathNode;
@@ -517,7 +428,7 @@ export class ExpressionVisualizerWebComponent extends LitElement {
       this._generateExpression();
     };
   }
-
+  // 添加函数
   private _addFunctionNode(name: string) {
     return () => {
       const block = {
@@ -554,7 +465,7 @@ export class ExpressionVisualizerWebComponent extends LitElement {
       this._generateExpression();
     };
   }
-
+  // 添加变量
   private _addSymbolNode(name: string) {
     return () => {
       const block = {
@@ -569,7 +480,100 @@ export class ExpressionVisualizerWebComponent extends LitElement {
       this._generateExpression();
     };
   }
+  // 修改
+  // 子组件上报事件
+  // 拖拽一个表达式到另一个表达式的插槽
+  private _handleChanged(e: CustomEvent) {
+    e.preventDefault();
 
+    const blocks: MathNode[] = JSON.parse(JSON.stringify(this._blocks));
+
+    const { sourceId, targetId } = e.detail;
+    // console.log({ sourceId, targetId });
+    const { node: sourceNode, parent: sourceParent } = this._findNodeAndParent(
+      blocks,
+      sourceId
+    );
+    const { node: targetNode, parent: targetParent } = this._findNodeAndParent(
+      blocks,
+      targetId
+    );
+
+    // console.log({ sourceNode, sourceParent, targetNode, targetParent });
+    const { path, index } = sourceNode!;
+    // console.log({ path, index });
+
+    sourceNode!.path = targetNode!.path;
+    sourceNode!.index = targetNode!.index;
+    // console.log(targetNode!.path, targetNode!.index)
+    targetParent!.args!.splice(targetNode!.index!, 1, sourceNode!);
+
+    if (sourceParent) {
+      sourceParent!.args!.splice(index!, 1, {
+        type: 'ConstantNode',
+        value: 'U',
+        uuid: uuidv4(),
+        isUnknown: true,
+        path,
+        index,
+      });
+      this._blocks = blocks;
+    } else {
+      this._blocks = blocks.filter(block => block.uuid !== sourceNode!.uuid);
+    }
+
+    // 表达式
+    this._generateExpression();
+  }
+  // 修改
+  // 拖拽表达式到画布空白处
+  private _handleDrop() {
+    return (e: DragEvent) => {
+      e.preventDefault();
+
+      // console.log("---- drop 2");
+      if ((e.target as HTMLElement).className !== 'expression-visualizer')
+        return;
+
+      const blocks: MathNode[] = JSON.parse(JSON.stringify(this._blocks));
+
+      const id = e.dataTransfer!.getData('text/plain');
+  
+      const { node, parent } = this._findNodeAndParent(blocks, id);
+
+      // console.log({ node, parent })
+      if (!node || !parent) return;
+
+      // 原来的位置替换为 UNKNOWN
+      parent!.args!.splice(node!.index!, 1, {
+        type: 'ConstantNode',
+        value: 'U',
+        uuid: uuidv4(),
+        isUnknown: true,
+        path: node!.path,
+        index: node!.index!,
+      });
+
+      // e.target 一定是class="expression-visualizer" 的 div
+      this._blocks = [...blocks, node!];
+
+      // 表达式
+      this._generateExpression();
+    };
+  }
+  // 删除 block
+  private _deleteBlock(index: number) {
+    return () => {
+      this._blocks = this._blocks.filter((_, i) => i !== index);
+      // 手动触发更新
+      // this.requestUpdate();
+
+      // 表达式
+      this._generateExpression();
+    };
+  }
+
+  // 将表达式字符串转换为 blocks
   private _setExpression(expression: string) {
     if (this._expression === expression) return;
     this._expression = expression;
@@ -584,7 +588,7 @@ export class ExpressionVisualizerWebComponent extends LitElement {
   connectedCallback() {
     super.connectedCallback();
 
-    _init().then((hasMath: boolean) => {
+    _initMath().then((hasMath: boolean) => {
       this._hasMath = hasMath;
 
       const detail = { hasMath };
@@ -623,6 +627,7 @@ export class ExpressionVisualizerWebComponent extends LitElement {
     ) {
       if (!this._hasMath) return;
 
+      // 每当传入表达式字符串发生变化时，都会触发这个函数
       this._setExpression(this.expression);
       // eslint-disable-next-line no-console
       console.log(
@@ -694,7 +699,7 @@ export class ExpressionVisualizerWebComponent extends LitElement {
           }
           return html`
             <tree-component
-              @changed=${this._changedHandler}
+              @changed=${this._handleChanged}
               .block=${block}
             ></tree-component>
             <button
