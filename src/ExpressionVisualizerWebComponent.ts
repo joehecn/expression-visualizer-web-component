@@ -206,6 +206,9 @@ export class ExpressionVisualizerWebComponent extends LitElement {
   _curTheme = themeMap.get(this.theme);
 
   @state()
+  _ss = ""
+
+  @state()
   _hasMath = false;
 
   @state()
