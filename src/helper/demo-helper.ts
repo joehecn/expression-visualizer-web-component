@@ -35,7 +35,12 @@ const _funcs = [{ name: 'equalText' }];
 const _variables: {
   name: string;
   test: boolean | number | string;
-}[] = [];
+}[] = [
+  { name: 'variable1', test: 1 },
+  { name: 'variable2', test: true },
+  { name: 'variable3', test: false },
+  { name: 'variable4', test: 'abc' },
+];
 
 @customElement('demo-helper')
 export class DemoHelper extends LitElement {
@@ -52,7 +57,7 @@ export class DemoHelper extends LitElement {
   private hiddenexpression: boolean = false;
 
   @state()
-  private expression: string = '';
+  private expression: string = '(1)*(2+3)>0 and equalText(variable4, "abc")';
 
   @state()
   private operators: {

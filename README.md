@@ -105,7 +105,7 @@ npm version patch # Bumping a new version
 - [x] npm publish
 - [x] tests
 - [x] properties form helper
-- [ ] tree component requestUpdate
+- [x] tree component requestUpdate
 - [ ] after double click edit constent
 - [ ] vue
 - [ ] angular

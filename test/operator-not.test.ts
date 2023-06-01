@@ -67,7 +67,7 @@ describe('operator not', function t() {
     console.log({ source, target });
 
     triggerDragAndDrop(source!, target!);
-    await sleep(600);
+    await sleep(800);
 
     expect(el._blocks.length).to.equal(1);
     expect(el._expression).to.equal(

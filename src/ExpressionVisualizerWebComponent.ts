@@ -64,7 +64,7 @@ function _node2Blocks(node: any) {
     if (parent) {
       const parentBlock = _ndWeakMap.get(parent);
 
-      if (parentBlock.type === 'OperatorNode') {
+      if (['OperatorNode', 'FunctionNode'].includes(parentBlock.type)) {
         const index = parseInt(path.replace('args[', ''), 10);
         block.index = index;
         parentBlock.args[index] = block;
@@ -289,16 +289,18 @@ export class ExpressionVisualizerWebComponent extends LitElement {
   private _getExpression(block: MathNode) {
     const ctx: any = {};
     this._block2Node(block, ctx);
-    // console.log(ctx.node)
+
     if (ctx.node) {
       return ctx.node.toString();
     }
+
     return '';
   }
 
   private _generateExpression() {
     // 获取 block
     const block = this._getBlock();
+
     if (!block) {
       this._expression = '';
     } else {
@@ -335,42 +337,19 @@ export class ExpressionVisualizerWebComponent extends LitElement {
     return { node: null, parent: null };
   }
 
-  // TODO: 怎么自动触发更新?
-  // 下面的代码是为了手动触发更新
-  private _triggerUpdate() {
-    // 在列表前面插入一个 UNKNOWN, setTimeout后再删除
-    this._blocks = [
-      {
-        type: 'ConstantNode',
-        value: 'U',
-        uuid: uuidv4(),
-        isUnknown: true,
-      },
-      ...this._blocks,
-    ];
-
-    setTimeout(() => {
-      this._blocks = this._blocks.filter((_, i) => i !== 0);
-
-      // 表达式
-      this._generateExpression();
-    });
-  }
-
   private _changedHandler(e: CustomEvent) {
     e.preventDefault();
 
-    // console.log("---- changed handler");
-    // console.log(e.target);
+    const blocks: MathNode[] = JSON.parse(JSON.stringify(this._blocks));
 
     const { sourceId, targetId } = e.detail;
     // console.log({ sourceId, targetId });
     const { node: sourceNode, parent: sourceParent } = this._findNodeAndParent(
-      this._blocks,
+      blocks,
       sourceId
     );
     const { node: targetNode, parent: targetParent } = this._findNodeAndParent(
-      this._blocks,
+      blocks,
       targetId
     );
 
@@ -392,20 +371,13 @@ export class ExpressionVisualizerWebComponent extends LitElement {
         path,
         index,
       });
+      this._blocks = blocks;
     } else {
-      this._blocks = this._blocks.filter(
-        block => block.uuid !== sourceNode!.uuid
-      );
+      this._blocks = blocks.filter(block => block.uuid !== sourceNode!.uuid);
     }
 
-    // console.log(JSON.stringify(this.blocks, null, 2))
-
-    // TODO: 怎么自动触发更新?
-    // 下面的代码是为了手动触发更新
-    this._triggerUpdate();
-
     // 表达式
-    // this._generateExpression();
+    this._generateExpression();
   }
 
   private _deleteBlock(index: number) {
@@ -460,10 +432,12 @@ export class ExpressionVisualizerWebComponent extends LitElement {
       if ((e.target as HTMLElement).className !== 'expression-visualizer')
         return;
 
+      const blocks: MathNode[] = JSON.parse(JSON.stringify(this._blocks));
+
       const id = e.dataTransfer!.getData('text/plain');
       // console.log(this);
       // console.log(this._findNodeAndParent);
-      const { node, parent } = this._findNodeAndParent(this._blocks, id);
+      const { node, parent } = this._findNodeAndParent(blocks, id);
 
       // console.log({ node, parent })
       if (!node || !parent) return;
@@ -479,13 +453,10 @@ export class ExpressionVisualizerWebComponent extends LitElement {
       });
 
       // e.target 一定是class="expression-visualizer" 的 div
-      this._blocks = [...this._blocks, node!];
-
-      // 下面的代码是为了手动触发更新
-      this._triggerUpdate();
+      this._blocks = [...blocks, node!];
 
       // 表达式
-      // this._generateExpression();
+      this._generateExpression();
     };
   }
 
