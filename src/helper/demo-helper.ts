@@ -48,6 +48,9 @@ export class DemoHelper extends LitElement {
     .properties-helper {
       padding-top: 16px;
     }
+    #expression-input {
+      min-width: 400px;
+    }
   `;
 
   @state()

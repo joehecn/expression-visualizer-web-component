@@ -18,13 +18,13 @@ export class FilterVariablesHelper extends LitElement {
   }[] = [];
 
   @state()
-  private errMsg = '';
+  private _errMsg = '';
 
   @query('#name-input')
-  name!: HTMLInputElement;
+  _name!: HTMLInputElement;
 
   @query('#test-input')
-  test!: HTMLInputElement;
+  _test!: HTMLInputElement;
 
   onChanged() {
     const filter = this.list.map(({ name, test }) => ({ name, test }));
@@ -40,23 +40,23 @@ export class FilterVariablesHelper extends LitElement {
   }
 
   addItem() {
-    this.errMsg = '';
+    this._errMsg = '';
 
-    const { name } = this;
+    const { _name: name } = this;
     if (!name.value) {
-      this.errMsg = 'Name is required';
+      this._errMsg = 'Name is required';
       return;
     }
 
-    const { test } = this;
+    const { _test: test } = this;
     if (!test.value) {
-      this.errMsg = 'Test is required';
+      this._errMsg = 'Test is required';
       return;
     }
 
     // 变量名不能重复
     if (this.list.find(item => item.name === name.value)) {
-      this.errMsg = 'Name is duplicated';
+      this._errMsg = 'Name is duplicated';
       return;
     }
 
@@ -70,6 +70,9 @@ export class FilterVariablesHelper extends LitElement {
     }
 
     this.list.push({ name: name.value, test: value });
+    this._name.value = '';
+    this._test.value = '';
+
     this.requestUpdate();
 
     this.onChanged();
@@ -90,7 +93,7 @@ export class FilterVariablesHelper extends LitElement {
         <input id="name-input" placeholder="Input a variable name" />
         <input id="test-input" placeholder="Input a test value" />
         <button @click=${this.addItem}>Add</button>
-        <div class="err-msg">${this.errMsg}</div>
+        <div class="err-msg">${this._errMsg}</div>
       </div>
 
       <ul>
