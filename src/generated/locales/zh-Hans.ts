@@ -23,4 +23,8 @@ export const templates = {
   sc89cd442be811d18: `等于文本`,
   sdc673e73b5c13aea: `删除`,
   se6f79719051ff286: `与`,
+  s21850986a1e17012: `常量列表`,
+  s24c4a77adbded558: `工具栏`,
+  s570a7069f8a26d79: `属性列表`,
+  s6ab73c998850c5ab: `表达式`,
 };
