@@ -112,3 +112,12 @@ npm version patch # Bumping a new version
 - [ ] angular
 - [ ] react
 - [ ] think about the tree structure
+
+
+##TODO
+- [ ] support is not hidden constant input
+- [ ] create a constant arr
+- [ ] expected value into constant array
+- [ ] support revoke
+- [ ] support modify theme
+

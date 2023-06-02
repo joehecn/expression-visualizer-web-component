@@ -15,7 +15,7 @@ const themeMap = new Map([
   [
     'light',
     {
-      expressionVisualizerStyle: 'background-color: #eee;',
+      expressionVisualizerStyle: 'background-color: #F2F3F5;',
     },
   ],
   [
@@ -121,6 +121,10 @@ async function _initMath() {
 @localized()
 export class ExpressionVisualizerWebComponent extends LitElement {
   static styles = css`
+  html {
+    color:#4E5969;
+    font-family: SimSun, sans-serif;
+  }
     .expression-visualizer {
       min-height: 300px;
     }
@@ -131,13 +135,13 @@ export class ExpressionVisualizerWebComponent extends LitElement {
     .hidden.expression {
       display: none;
     }
+    .hidden {
+      display: none;
+    }
     .tools {
       padding: 8px 0;
     }
-    .tools button {
-      height: 26px;
-      margin: 2px 0;
-    }
+
     .tools input {
       height: 20px;
       margin: 2px 0;
@@ -162,6 +166,37 @@ export class ExpressionVisualizerWebComponent extends LitElement {
     .err-msg {
       color: red;
     }
+    .title-name {
+      display:inline-block;
+      text-align: right;
+      font-size: 14px;
+      margin-right: 10px;
+    }
+    .w-125 {
+      width: 110px;
+    }
+    .w-70 {
+      width: 70px;
+    }
+    .optbtn{
+      height: 20px;
+      min-width: 20px;
+      border-radius: 3px;
+      background-color: #1BBEF7;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+    }
+    .varbtn {
+      height: 22px;
+      border: none;
+      cursor: pointer;
+      color:#4E5969;
+    }
+    .delete-btn {
+      color:#4E5969;
+      border-color: color:#4E5969;;
+    }
   `;
 
   @property({ type: String }) theme: string = 'light';
@@ -169,6 +204,10 @@ export class ExpressionVisualizerWebComponent extends LitElement {
   @property({ type: String }) locale = 'zh-Hant-HK';
 
   @property({ type: Boolean }) hiddenexpression = false;
+
+  @property({ type: Boolean }) hiddenConstant = false;
+
+  @property({ type: Array }) constantList: any[] = [];
 
   @property({ type: String }) expression = '';
 
@@ -206,7 +245,7 @@ export class ExpressionVisualizerWebComponent extends LitElement {
   _curTheme = themeMap.get(this.theme);
 
   @state()
-  _ss = ""
+  _ss = '';
 
   @state()
   _hasMath = false;
@@ -372,6 +411,10 @@ export class ExpressionVisualizerWebComponent extends LitElement {
       value = Number(value);
     }
 
+    if (!this.constantList.includes(value)) {
+      this.constantList.push(value);
+    }
+
     const block = {
       type: 'ConstantNode',
       value,
@@ -384,6 +427,39 @@ export class ExpressionVisualizerWebComponent extends LitElement {
 
     // 表达式
     this._generateExpression();
+  }
+
+  // 从常数列表中添加常量
+  private _addConstantNodeForm2List(constant: any) {
+    return () => {
+      let value: any;
+
+      if (constant === undefined || constant === null) return;
+
+      if (constant === 'true') {
+        value = true;
+      } else if (constant === 'false') {
+        value = false;
+      } else if (
+        typeof constant !== 'boolean' &&
+        !Number.isNaN(Number(constant))
+      ) {
+        value = Number(constant);
+      } else {
+        value = constant;
+      }
+
+      const block = {
+        type: 'ConstantNode',
+        value,
+        uuid: uuidv4(),
+      };
+
+      this._blocks = [block, ...this._blocks];
+
+      // 表达式
+      this._generateExpression();
+    };
   }
 
   private _handleKeydown(e: KeyboardEvent) {
@@ -673,85 +749,150 @@ export class ExpressionVisualizerWebComponent extends LitElement {
         this.expression
       );
     }
+
+    if (changedProperties.has('variables')) {
+      const variableValue = this.variables.map(item => item.test);
+      variableValue.forEach(constant => {
+        if (!this.constantList.includes(constant)) {
+          this.constantList.push(constant);
+        }
+      });
+    }
   }
 
   render() {
     return html`
-      <div class=${this.hiddenexpression ? 'hidden expression' : 'expression'}>
-        <span class="block">${this._expression}</span>
-        <span class="equal">=</span>
-        <span class="block">${this._result}</span>
+      <div style="color:#4E5969">
+        <div
+          class=${this.hiddenexpression ? 'hidden expression' : 'expression'}
+        >
+          <span
+            class=${this.locale === 'en'
+              ? 'title-name w-125'
+              : 'title-name w-70'}
+            style="margin-right:15px"
+            >${msg('Expression')}:</span
+          >
+          <span class="block">${this._expression}</span>
+          <span class="equal">=</span>
+          <span class="block">${this._result}</span>
+        </div>
+        <div class="tools">
+          <span
+            class=${this.locale === 'en'
+              ? 'title-name w-125'
+              : 'title-name w-70'}
+            >${msg('Toolbar')}:</span
+          >
+          <input
+            id="newconstant-input"
+            class=${this.hiddenConstant ? 'hidden' : ''}
+            placeholder=${msg('Enter a constant')}
+          />
+          <button
+            id="addconstant-btn"
+            style="color:#4E5969;"
+            class=${this.hiddenConstant ? 'hidden' : ''}
+            @click=${this._addConstantNode}
+          >
+            ${msg('Add constant')}
+          </button>
+          <span class="split-group"></span>
+          ${map(
+            this.operators.filter(operator => operatorMap.has(operator.name)),
+            operator => html`
+              <button
+                class="optbtn"
+                .id=${`${operatorMap.get(operator.name)}-btn`}
+                @click=${this._addOperatorNode(operator.name)}
+              >
+                ${operator.name}
+              </button>
+            `
+          )}
+          ${map(
+            this.funcs.filter(func => funcMap.has(func.name)),
+            func => html`
+              <button
+                class="optbtn"
+                style="font-size: 12px"
+                .id=${`${func.name}-btn`}
+                @click=${this._addFunctionNode(func.name)}
+              >
+                ${msg(func.name)}
+              </button>
+            `
+          )}
+          <div style="padding: 8px 0">
+            <span
+              class=${this.locale === 'en'
+                ? 'title-name w-125'
+                : 'title-name w-70'}
+              >${msg('Attribute List')}:</span
+            >
+            ${map(
+              this.variables,
+              variable => html`
+                <button
+                  class="varbtn"
+                  .id=${`${variable.name}-btn`}
+                  @click=${this._addSymbolNode(variable.name)}
+                >
+                  ${variable.name} = ${variable.test}
+                </button>
+              `
+            )}
+          </div>
+          <div>
+            <span
+              class=${this.locale === 'en'
+                ? 'title-name w-125'
+                : 'title-name w-70'}
+              >${msg('Constants List')}:</span
+            >
+            ${map(
+              this.constantList,
+              constant => html`
+                <button
+                  class="varbtn"
+                  .id=${`${constant}-constbtn`}
+                  @click=${this._addConstantNodeForm2List(constant)}
+                >
+                  ${constant}
+                </button>
+              `
+            )}
+          </div>
+        </div>
+        <div
+          class="expression-visualizer"
+          style=${this._curTheme!.expressionVisualizerStyle}
+          droppable="true"
+          .ondragover=${_handleDragOver}
+          .ondrop=${this._handleDrop()}
+        >
+          ${map(this._blocks, (block, index) => {
+            if (block.isUnknown) {
+              return html``;
+            }
+            return html`
+              <tree-component
+                @changed=${this._handleChanged}
+                .block=${block}
+              ></tree-component>
+              <button
+                class="delete-btn"
+                style="height: 26px;"
+                @click=${this._deleteBlock(index)}
+              >
+                ${msg('Delete')}
+              </button>
+              <br />
+            `;
+          })}
+        </div>
+        <span class="err-msg">${this._errMsg}</span>
       </div>
-      <div class="tools">
-        <input id="newconstant-input" placeholder=${msg('Enter a constant')} />
-        <button id="addconstant-btn" @click=${this._addConstantNode}>
-          ${msg('Add constant')}
-        </button>
-        <span class="split-group"></span>
-        ${map(
-          this.operators.filter(operator => operatorMap.has(operator.name)),
-          operator => html`
-            <button
-              .id=${`${operatorMap.get(operator.name)}-btn`}
-              @click=${this._addOperatorNode(operator.name)}
-            >
-              ${msg(operator.name)}
-            </button>
-          `
-        )}
-        <span class="split-group"></span>
-        ${map(
-          this.funcs.filter(func => funcMap.has(func.name)),
-          func => html`
-            <button
-              .id=${`${func.name}-btn`}
-              @click=${this._addFunctionNode(func.name)}
-            >
-              ${msg(func.name)}
-            </button>
-          `
-        )}
-        <span class="split-group"></span>
-        ${map(
-          this.variables,
-          variable => html`
-            <button
-              .id=${`${variable.name}-btn`}
-              @click=${this._addSymbolNode(variable.name)}
-            >
-              ${variable.name} = ${variable.test}
-            </button>
-          `
-        )}
-      </div>
-      <div
-        class="expression-visualizer"
-        style=${this._curTheme!.expressionVisualizerStyle}
-        droppable="true"
-        .ondragover=${_handleDragOver}
-        .ondrop=${this._handleDrop()}
-      >
-        ${map(this._blocks, (block, index) => {
-          if (block.isUnknown) {
-            return html``;
-          }
-          return html`
-            <tree-component
-              @changed=${this._handleChanged}
-              .block=${block}
-            ></tree-component>
-            <button
-              class="delete-btn"
-              style="height: 26px;"
-              @click=${this._deleteBlock(index)}
-            >
-              ${msg('Delete')}
-            </button>
-            <br />
-          `;
-        })}
-      </div>
-      <span class="err-msg">${this._errMsg}</span>
     `;
   }
 }

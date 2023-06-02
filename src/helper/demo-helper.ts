@@ -63,6 +63,9 @@ export class DemoHelper extends LitElement {
   private hiddenexpression: boolean = false;
 
   @state()
+  private hiddenConstant: boolean = false;
+
+  @state()
   private expression: string = '(1)*(2+3)>0 and equalText(variable4, "abc")';
 
   @state()
@@ -111,6 +114,11 @@ export class DemoHelper extends LitElement {
     this.hiddenexpression = (e.target as HTMLInputElement).checked;
   }
 
+  // 常熟输入框 是否隐藏
+  onHiddenConstantChanged(e: Event) {
+    this.hiddenConstant = (e.target as HTMLInputElement).checked;
+  }
+
   onSendExpression() {
     if (this.input.value === this.expression) return;
 
@@ -141,6 +149,7 @@ export class DemoHelper extends LitElement {
         .theme=${this.theme}
         .locale=${this.locale}
         .hiddenexpression=${this.hiddenexpression}
+        .hiddenConstant=${this.hiddenConstant}
         .expression=${this.expression}
         .operators=${this.operators}
         .funcs=${this.funcs}
@@ -162,6 +171,15 @@ export class DemoHelper extends LitElement {
         name="hiddenexpression"
         .checked=${this.hiddenexpression}
         @change=${this.onHiddenExpressionChanged}
+      />
+      <div class="properties-helper"></div>
+      hiddenConstant:
+      <input
+        type="checkbox"
+        id="hiddenConstant"
+        name="hiddenConstant"
+        .checked=${this.hiddenConstant}
+        @change=${this.onHiddenConstantChanged}
       />
       <div class="properties-helper"></div>
       expression:

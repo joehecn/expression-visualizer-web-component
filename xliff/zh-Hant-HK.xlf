@@ -74,6 +74,22 @@
   <source>Delete</source>
   <target>刪除</target>
 </trans-unit>
+<trans-unit id="s24c4a77adbded558">
+  <source>Toolbar</source>
+  <target>工具欄</target>
+</trans-unit>
+<trans-unit id="s6ab73c998850c5ab">
+  <source>Expression</source>
+  <target>表達式</target>
+</trans-unit>
+<trans-unit id="s570a7069f8a26d79">
+  <source>Attribute List</source>
+  <target>屬性列表</target>
+</trans-unit>
+<trans-unit id="s21850986a1e17012">
+  <source>Constants List</source>
+  <target>常量列表</target>
+</trans-unit>
 </body>
 </file>
 </xliff>
