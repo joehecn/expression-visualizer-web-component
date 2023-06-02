@@ -5,6 +5,7 @@ import '../expression-visualizer-web-component.js';
 import './locale-picker-helper.js';
 import './filter-list-helper.js';
 import './filter-variables-helper.js';
+import { map } from 'lit/directives/map.js';
 
 function handleExpressionInited(e: CustomEvent) {
   // eslint-disable-next-line no-console
@@ -66,6 +67,9 @@ export class DemoHelper extends LitElement {
   private hiddenConstant: boolean = false;
 
   @state()
+  private constantList: any[] = [3, 4];
+
+  @state()
   private expression: string = '(1)*(2+3)>0 and equalText(variable4, "abc")';
 
   @state()
@@ -98,6 +102,12 @@ export class DemoHelper extends LitElement {
     if (this.expression === expression) return;
 
     this.expression = expression;
+  }
+
+  variableListChange(e: CustomEvent) {
+    // console.log( e.detail.constantList)
+    this.constantList = e.detail.constantList;
+    console.log(this.constantList);
   }
 
   onLocaleChanged(e: CustomEvent) {
@@ -154,8 +164,10 @@ export class DemoHelper extends LitElement {
         .operators=${this.operators}
         .funcs=${this.funcs}
         .variables=${this.variables}
+        .constantList=${this.constantList}
         @expression-inited=${handleExpressionInited}
         @expression-changed=${this.handleExpressionChanged}
+        @variableList-changed=${this.variableListChange}
       ></expression-visualizer-web-component>
       <div class="properties-helper"></div>
       <h4>Properties</h4>
@@ -202,6 +214,17 @@ export class DemoHelper extends LitElement {
         .list=${_funcs}
         @filter-changed=${this.onFuncsChanged}
       ></filter-list-helper>
+      <div class="properties-helper"></div>
+
+      operators:
+      ${map(
+        this.constantList,
+        constant => html`
+          <button class="varbtn" .id=${`${constant}-constbtn`}>
+            ${constant}
+          </button>
+        `
+      )}
       <div class="properties-helper"></div>
       variables:
       <filter-variables-helper

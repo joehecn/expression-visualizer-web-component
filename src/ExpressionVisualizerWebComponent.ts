@@ -413,6 +413,15 @@ export class ExpressionVisualizerWebComponent extends LitElement {
 
     if (!this.constantList.includes(value)) {
       this.constantList.push(value);
+      const event = new CustomEvent('variableList-changed', {
+        detail: {
+          constantList: this.constantList,
+        },
+        bubbles: true,
+        composed: true,
+        cancelable: true,
+      });
+      this.dispatchEvent(event);
     }
 
     const block = {
@@ -757,6 +766,15 @@ export class ExpressionVisualizerWebComponent extends LitElement {
           this.constantList.push(constant);
         }
       });
+      const event = new CustomEvent('variableList-changed', {
+        detail: {
+          constantList: this.constantList,
+        },
+        bubbles: true,
+        composed: true,
+        cancelable: true,
+      });
+      this.dispatchEvent(event);
     }
   }
 
