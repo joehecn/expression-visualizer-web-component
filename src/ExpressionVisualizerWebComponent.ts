@@ -121,10 +121,10 @@ async function _initMath() {
 @localized()
 export class ExpressionVisualizerWebComponent extends LitElement {
   static styles = css`
-  html {
-    color:#4E5969;
-    font-family: SimSun, sans-serif;
-  }
+    html {
+      color: #4e5969;
+      font-family: SimSun, sans-serif;
+    }
     .expression-visualizer {
       min-height: 300px;
     }
@@ -167,22 +167,18 @@ export class ExpressionVisualizerWebComponent extends LitElement {
       color: red;
     }
     .title-name {
-      display:inline-block;
-      text-align: right;
+      display: inline-block;
+      text-align: left;
       font-size: 14px;
-      margin-right: 10px;
+      margin-right: 20px;
+      width: 160px;
     }
-    .w-125 {
-      width: 110px;
-    }
-    .w-70 {
-      width: 70px;
-    }
-    .optbtn{
+
+    .optbtn {
       height: 20px;
       min-width: 20px;
       border-radius: 3px;
-      background-color: #1BBEF7;
+      background-color: #1bbef7;
       color: #fff;
       border: none;
       cursor: pointer;
@@ -191,11 +187,21 @@ export class ExpressionVisualizerWebComponent extends LitElement {
       height: 22px;
       border: none;
       cursor: pointer;
-      color:#4E5969;
+      color: #4e5969;
+    }
+    .varbtn:hover {
+      border: 1px solid #1bbef7;
     }
     .delete-btn {
-      color:#4E5969;
-      border-color: color:#4E5969;;
+      color: #1bbef7;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .expression-cls {
+      background-color: #f2f3f5;
+      height: 32px;
+      border: none;
+      line-height: 32px;
     }
   `;
 
@@ -239,7 +245,11 @@ export class ExpressionVisualizerWebComponent extends LitElement {
   @property({ type: Array }) variables: {
     name: string;
     test: string | number | boolean;
+    op?: string;
+    isFn?: string;
   }[] = [];
+
+  @property({ type: String }) operatorMode: 'default' | 'variable' = 'default';
 
   @state()
   _curTheme = themeMap.get(this.theme);
@@ -590,6 +600,71 @@ export class ExpressionVisualizerWebComponent extends LitElement {
     };
   }
 
+  // 添加变量
+  private _addSymbolNode2(variable: any) {
+    return () => {
+      let block: any;
+
+      if (variable.isFn) {
+        block = {
+          args: [
+            {
+              type: 'SymbolNode',
+              uuid: uuidv4(),
+              path: 'args[0]',
+              index: 0,
+              name: variable.name,
+            },
+            {
+              type: 'ConstantNode',
+              value: variable.test,
+              uuid: uuidv4(),
+              path: 'args[1]',
+              index: 1,
+            },
+          ],
+          fn: {
+            name: variable.isFn,
+          },
+          implicit: false,
+          isPercentage: false,
+          type: 'FunctionNode',
+          uuid: uuidv4(),
+        };
+      } else {
+        block = {
+          uuid: uuidv4(),
+          implicit: false,
+          isPercentage: false,
+          op: variable.op,
+          fn: operatorMap.get(variable.op),
+          args: [
+            {
+              type: 'SymbolNode',
+              uuid: uuidv4(),
+              path: 'args[0]',
+              index: 0,
+              name: variable.name,
+            },
+            {
+              type: 'ConstantNode',
+              value: variable.test,
+              uuid: uuidv4(),
+              path: 'args[1]',
+              index: 1,
+            },
+          ],
+          type: 'OperatorNode',
+        };
+      }
+
+      this._blocks = [block, ...this._blocks];
+
+      // 表达式
+      this._generateExpression();
+    };
+  }
+
   // 修改
   // 子组件上报事件
   // 拖拽一个表达式到另一个表达式的插槽
@@ -784,24 +859,15 @@ export class ExpressionVisualizerWebComponent extends LitElement {
         <div
           class=${this.hiddenexpression ? 'hidden expression' : 'expression'}
         >
-          <span
-            class=${this.locale === 'en'
-              ? 'title-name w-125'
-              : 'title-name w-70'}
-            style="margin-right:15px"
+          <span class="title-name" style="margin-right:25px"
             >${msg('Expression')}:</span
           >
-          <span class="block">${this._expression}</span>
+          <span class="block expression-cls">${this._expression}</span>
           <span class="equal">=</span>
-          <span class="block">${this._result}</span>
+          <span class="block expression-cls">${this._result}</span>
         </div>
         <div class="tools">
-          <span
-            class=${this.locale === 'en'
-              ? 'title-name w-125'
-              : 'title-name w-70'}
-            >${msg('Toolbar')}:</span
-          >
+          <span class="title-name">${msg('Toolbar')}:</span>
           <input
             id="newconstant-input"
             class=${this.hiddenConstant ? 'hidden' : ''}
@@ -815,7 +881,7 @@ export class ExpressionVisualizerWebComponent extends LitElement {
           >
             ${msg('Add constant')}
           </button>
-          <span class="split-group"></span>
+          <span class=${this.hiddenConstant ? 'hidden' : 'split-group'}></span>
           ${map(
             this.operators.filter(operator => operatorMap.has(operator.name)),
             operator => html`
@@ -842,38 +908,32 @@ export class ExpressionVisualizerWebComponent extends LitElement {
             `
           )}
           <div style="padding: 8px 0">
-            <span
-              class=${this.locale === 'en'
-                ? 'title-name w-125'
-                : 'title-name w-70'}
-              >${msg('Attribute List')}:</span
-            >
+            <span class="title-name">${msg('Attribute List')}:</span>
             ${map(
               this.variables,
               variable => html`
                 <button
                   class="varbtn"
                   .id=${`${variable.name}-btn`}
-                  @click=${this._addSymbolNode(variable.name)}
+                  @click=${this.operatorMode === 'variable'
+                    ? this._addSymbolNode2(variable)
+                    : this._addSymbolNode(variable.name)}
                 >
-                  ${variable.name} = ${variable.test}
+                  ${variable.name}
+                  ${this.operatorMode === 'variable' ? variable.op : '='}
+                  ${variable.test}
                 </button>
               `
             )}
           </div>
-          <div>
-            <span
-              class=${this.locale === 'en'
-                ? 'title-name w-125'
-                : 'title-name w-70'}
-              >${msg('Constants List')}:</span
-            >
+          <div class=${this.operatorMode === 'variable' ? 'hidden' : ''}>
+            <span class="title-name">${msg('Constants List')}:</span>
             ${map(
               this.constantList,
               constant => html`
                 <button
                   class="varbtn"
-                  .id=${`${constant}-constbtn`}
+                  .id=${`constbtn-${constant}`}
                   @click=${this._addConstantNodeForm2List(constant)}
                 >
                   ${constant}
@@ -897,10 +957,11 @@ export class ExpressionVisualizerWebComponent extends LitElement {
               <tree-component
                 @changed=${this._handleChanged}
                 .block=${block}
+                .operatorMode=${this.operatorMode}
               ></tree-component>
               <button
                 class="delete-btn"
-                style="height: 26px;"
+                style="height: 26px; border: none; background-color: transparent"
                 @click=${this._deleteBlock(index)}
               >
                 ${msg('Delete')}

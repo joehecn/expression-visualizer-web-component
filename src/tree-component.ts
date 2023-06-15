@@ -15,8 +15,18 @@ function _handleDragStart(e: DragEvent) {
 function _handleDragOver(e: DragEvent) {
   e.preventDefault();
 
+  const element = e.target! as HTMLElement;
+  element.classList.add('border-color');
+
   // console.log("---- drag over 1");
 
+  e.dataTransfer!.dropEffect = 'move';
+}
+
+function _handleDragLeave(e: DragEvent) {
+  e.preventDefault();
+  const element = e.target! as HTMLElement;
+  element.classList.remove('border-color');
   e.dataTransfer!.dropEffect = 'move';
 }
 
@@ -41,6 +51,16 @@ export class TreeComponent extends LitElement {
       user-select: none;
     }
 
+    .variablemode {
+      cursor: unset;
+      border: 1px solid transparent;
+    }
+
+    .variablemode:not(.unknown):not(:has(:hover)):hover {
+      border: 1px solid transparent;
+      cursor: unset;
+    }
+
     .draggable {
       padding: 2px;
       margin: 2px;
@@ -61,6 +81,12 @@ export class TreeComponent extends LitElement {
       user-select: none;
       pointer-events: none;
     }
+
+    .block.border-color {
+      border: 1px solid #186fb0;
+      background-color: #1b8df6;
+      opacity: 0.5;
+    }
   `;
 
   @property() block: MathNode = {
@@ -69,6 +95,8 @@ export class TreeComponent extends LitElement {
     type: 'ConstantNode',
     value: 'U',
   };
+
+  @property({ type: String }) operatorMode: 'default' | 'variable' = 'default';
 
   private _handleDrop(e: DragEvent) {
     e.preventDefault();
@@ -95,9 +123,12 @@ export class TreeComponent extends LitElement {
           return html`
             <span
               id=${block.uuid}
-              class="block unknown leaf"
-              droppable="true"
+              class=${this.operatorMode === 'variable'
+                ? 'block leaf unknown variablemode'
+                : 'block leaf unknown'}
+              droppable=${this.operatorMode !== 'variable'}
               .ondragover=${_handleDragOver}
+              .ondragleave=${_handleDragLeave}
               .ondrop=${this._handleDrop}
               >${block.value}</span
             >
@@ -108,9 +139,12 @@ export class TreeComponent extends LitElement {
         return html`
           <span
             id=${block.uuid}
-            class="block leaf"
-            draggable="true"
+            class=${this.operatorMode === 'variable'
+              ? 'block leaf variablemode'
+              : 'block leaf'}
+            draggable=${this.operatorMode !== 'variable'}
             .ondragstart=${_handleDragStart}
+            .ondragleave=${_handleDragLeave}
             >${block.value}</span
           >
         `;
@@ -119,9 +153,12 @@ export class TreeComponent extends LitElement {
         return html`
           <span
             id=${block.uuid}
-            class="block leaf"
-            draggable="true"
+            class=${this.operatorMode === 'variable'
+              ? 'block leaf variablemode'
+              : 'block leaf'}
+            draggable=${this.operatorMode !== 'variable'}
             .ondragstart=${_handleDragStart}
+            .ondragleave=${_handleDragLeave}
             >${block.name}</span
           >
         `;
@@ -134,9 +171,13 @@ export class TreeComponent extends LitElement {
               class="block draggable"
               draggable="true"
               .ondragstart=${_handleDragStart}
+              .ondragleave=${_handleDragLeave}
             >
               <span class="op">${block.op}</span>
-              <tree-component .block=${block.args![0]}></tree-component>
+              <tree-component
+                .block=${block.args![0]}
+                .operatorMode=${this.operatorMode}
+              ></tree-component>
             </span>
           `;
         }
@@ -147,10 +188,17 @@ export class TreeComponent extends LitElement {
             class="block draggable"
             draggable="true"
             .ondragstart=${_handleDragStart}
+            .ondragleave=${_handleDragLeave}
           >
-            <tree-component .block=${block.args![0]}></tree-component>
+            <tree-component
+              .block=${block.args![0]}
+              .operatorMode=${this.operatorMode}
+            ></tree-component>
             <span class="op">${block.op}</span>
-            <tree-component .block=${block.args![1]}></tree-component>
+            <tree-component
+              .block=${block.args![1]}
+              .operatorMode=${this.operatorMode}
+            ></tree-component>
           </span>
         `;
       }
@@ -161,11 +209,18 @@ export class TreeComponent extends LitElement {
             class="block draggable"
             draggable="true"
             .ondragstart=${_handleDragStart}
+            .ondragleave=${_handleDragLeave}
           >
             <span class="op">${(block.fn as { name: string }).name}(</span>
-            <tree-component .block=${block.args![0]}></tree-component>
+            <tree-component
+              .block=${block.args![0]}
+              .operatorMode=${this.operatorMode}
+            ></tree-component>
             <span class="op">,</span>
-            <tree-component .block=${block.args![1]}></tree-component>
+            <tree-component
+              .block=${block.args![1]}
+              .operatorMode=${this.operatorMode}
+            ></tree-component>
             <span class="op">)</span>
           </span>
         `;

@@ -31,17 +31,30 @@ const _operators = [
   { name: 'not' },
 ];
 
+const _operators1 = [
+  { name: 'and' },
+  { name: 'or' },
+  { name: 'xor' },
+  { name: 'not' },
+];
+
 const _funcs = [{ name: 'equalText' }];
 
 const _variables: {
   name: string;
-  test: boolean | number | string;
+  test: string | number | boolean;
+  op?: string;
+  isFn?: string;
 }[] = [
-  { name: 'variable1', test: 1 },
-  { name: 'variable2', test: true },
-  { name: 'variable3', test: false },
-  { name: 'variable4', test: 'abc' },
+  { name: 'variable1', test: 1, op: '>' },
+  { name: 'variable2', test: true, op: '==' },
+  { name: 'variable3', test: false, op: '!=' },
+  { name: 'variable4', test: 'abc', op: '==', isFn: 'equalText' },
 ];
+
+const _operatorMode = 'default';
+
+const _operatorModeList = ['default', 'variable'];
 
 @customElement('demo-helper')
 export class DemoHelper extends LitElement {
@@ -53,6 +66,8 @@ export class DemoHelper extends LitElement {
       min-width: 400px;
     }
   `;
+
+  @state() private operatorMode: string = _operatorMode;
 
   @state()
   private theme: 'light' | 'dark' = 'light';
@@ -107,7 +122,6 @@ export class DemoHelper extends LitElement {
   variableListChange(e: CustomEvent) {
     // console.log( e.detail.constantList)
     this.constantList = e.detail.constantList;
-    console.log(this.constantList);
   }
 
   onLocaleChanged(e: CustomEvent) {
@@ -153,6 +167,11 @@ export class DemoHelper extends LitElement {
     this.variables = e.detail.filter;
   }
 
+  modeChanged(e: Event) {
+    const newMode = (e.target as HTMLSelectElement).value;
+    this.operatorMode = newMode;
+  }
+
   render() {
     return html`
       <expression-visualizer-web-component
@@ -161,8 +180,11 @@ export class DemoHelper extends LitElement {
         .hiddenexpression=${this.hiddenexpression}
         .hiddenConstant=${this.hiddenConstant}
         .expression=${this.expression}
-        .operators=${this.operators}
-        .funcs=${this.funcs}
+        .operators=${this.operatorMode === 'variable'
+          ? _operators1
+          : this.operators}
+        .operatorMode=${this.operatorMode}
+        .funcs=${this.operatorMode === 'variable' ? [] : this.funcs}
         .variables=${this.variables}
         .constantList=${this.constantList}
         @expression-inited=${handleExpressionInited}
@@ -175,6 +197,26 @@ export class DemoHelper extends LitElement {
         .locale=${this.locale}
         @locale-changed=${this.onLocaleChanged}
       ></locale-picker-helper>
+
+      <div class="properties-helper">
+        <label id="locale-label" for="locale-picker">operatorMode:</label>
+        <select
+          id="operator-mode"
+          aria-label="operatormode"
+          @change=${this.modeChanged}
+        >
+          ${_operatorModeList.map(
+            mode =>
+              html`<option
+                value=${mode}
+                ?selected=${mode === this.operatorMode}
+              >
+                ${mode}
+              </option>`
+          )}
+        </select>
+      </div>
+
       <div class="properties-helper"></div>
       hiddenexpression:
       <input
@@ -203,7 +245,7 @@ export class DemoHelper extends LitElement {
       />
       <button @click=${this.onSendExpression}>Send</button>
       <div class="properties-helper"></div>
-      operators:
+      constantList:
       <filter-list-helper
         .list=${_operators}
         @filter-changed=${this.onOperatorsChanged}

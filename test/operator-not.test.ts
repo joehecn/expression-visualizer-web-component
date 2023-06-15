@@ -69,6 +69,7 @@ describe('operator not', function t() {
     triggerDragAndDrop(source!, target!);
     await sleep(800);
 
+    console.log(121, el._blocks.length);
     expect(el._blocks.length).to.equal(1);
     expect(el._expression).to.equal(
       'not (1 * (2 + 3) > 0 and equalText(variable4, "abc"))'
