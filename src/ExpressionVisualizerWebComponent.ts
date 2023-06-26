@@ -15,7 +15,7 @@ const themeMap = new Map([
   [
     'light',
     {
-      expressionVisualizerStyle: 'background-color: #F2F3F5;',
+      expressionVisualizerStyle: 'background-color: #fff;',
     },
   ],
   [
@@ -126,7 +126,9 @@ export class ExpressionVisualizerWebComponent extends LitElement {
       font-family: SimSun, sans-serif;
     }
     .expression-visualizer {
-      min-height: 300px;
+      height: 200px;
+      overflow-y: auto;
+      padding: 20px;
     }
     .expression {
       display: flex;
@@ -171,7 +173,7 @@ export class ExpressionVisualizerWebComponent extends LitElement {
       text-align: left;
       font-size: 14px;
       margin-right: 20px;
-      width: 160px;
+      width: 100px;
     }
 
     .optbtn {
@@ -202,6 +204,40 @@ export class ExpressionVisualizerWebComponent extends LitElement {
       height: 32px;
       border: none;
       line-height: 32px;
+    }
+
+    .overall-style {
+      border: 2px solid #eee;
+      padding: 10px;
+      border-radius: 10px;
+    }
+    .tox-editor-header {
+      position: relative;
+      background-color: #fff;
+      border-bottom: none;
+      box-shadow: 0 2px 2px -2px rgba(34, 47, 62, 0.1),
+        0 8px 8px -4px rgba(34, 47, 62, 0.07);
+      padding: 10px 8px 0px;
+    }
+    .tox-statusbar {
+      align-items: center;
+      background-color: #fff;
+      border-top: 1px solid #e3e3e3;
+      flex: 0 0 auto;
+      font-size: 14px;
+      font-weight: 400;
+      min-height: 25px;
+      overflow: hidden;
+      padding: 0 8px;
+      position: relative;
+      text-transform: none;
+      padding-top: 10px;
+    }
+
+    .expression-toolbar {
+      display: flex;
+      align-items: center;
+      padding-top>: 10px;
     }
   `;
 
@@ -380,9 +416,8 @@ export class ExpressionVisualizerWebComponent extends LitElement {
 
     this._evaluate();
 
-    if (block && this._expression) {
-      this._expressionChanged();
-    }
+    // 无论表达式有没有都要触发表达式改变方法
+    this._expressionChanged();
   }
 
   private _findNodeAndParent(
@@ -855,91 +890,95 @@ export class ExpressionVisualizerWebComponent extends LitElement {
 
   render() {
     return html`
-      <div style="color:#4E5969">
-        <div
-          class=${this.hiddenexpression ? 'hidden expression' : 'expression'}
-        >
-          <span class="title-name" style="margin-right:25px"
-            >${msg('Expression')}:</span
+      <div style="color:#4E5969" class="overall-style">
+        <div class="tox-editor-header">
+          <div
+            class=${this.hiddenexpression ? 'hidden expression' : 'expression'}
           >
-          <span class="block expression-cls">${this._expression}</span>
-          <span class="equal">=</span>
-          <span class="block expression-cls">${this._result}</span>
-        </div>
-        <div class="tools">
-          <span class="title-name">${msg('Toolbar')}:</span>
-          <input
-            id="newconstant-input"
-            class=${this.hiddenConstant ? 'hidden' : ''}
-            placeholder=${msg('Enter a constant')}
-          />
-          <button
-            id="addconstant-btn"
-            style="color:#4E5969;"
-            class=${this.hiddenConstant ? 'hidden' : ''}
-            @click=${this._addConstantNode}
-          >
-            ${msg('Add constant')}
-          </button>
-          <span class=${this.hiddenConstant ? 'hidden' : 'split-group'}></span>
-          ${map(
-            this.operators.filter(operator => operatorMap.has(operator.name)),
-            operator => html`
-              <button
-                class="optbtn"
-                .id=${`${operatorMap.get(operator.name)}-btn`}
-                @click=${this._addOperatorNode(operator.name)}
-              >
-                ${operator.name}
-              </button>
-            `
-          )}
-          ${map(
-            this.funcs.filter(func => funcMap.has(func.name)),
-            func => html`
-              <button
-                class="optbtn"
-                style="font-size: 12px"
-                .id=${`${func.name}-btn`}
-                @click=${this._addFunctionNode(func.name)}
-              >
-                ${msg(func.name)}
-              </button>
-            `
-          )}
-          <div style="padding: 8px 0">
-            <span class="title-name">${msg('Attribute List')}:</span>
-            ${map(
-              this.variables,
-              variable => html`
-                <button
-                  class="varbtn"
-                  .id=${`${variable.name}-btn`}
-                  @click=${this.operatorMode === 'variable'
-                    ? this._addSymbolNode2(variable)
-                    : this._addSymbolNode(variable.name)}
-                >
-                  ${variable.name}
-                  ${this.operatorMode === 'variable' ? variable.op : '='}
-                  ${variable.test}
-                </button>
-              `
-            )}
+            <span class="title-name" style="margin-right:25px"
+              >${msg('Expression')}:</span
+            >
+            <span class="block expression-cls">${this._expression}</span>
+            <span class="equal">=</span>
+            <span class="block expression-cls">${this._result}</span>
           </div>
-          <div class=${this.operatorMode === 'variable' ? 'hidden' : ''}>
-            <span class="title-name">${msg('Constants List')}:</span>
+          <div class="tools">
+            <span class="title-name">${msg('Toolbar')}:</span>
+            <input
+              id="newconstant-input"
+              class=${this.hiddenConstant ? 'hidden' : ''}
+              placeholder=${msg('Enter a constant')}
+            />
+            <button
+              id="addconstant-btn"
+              style="color:#4E5969;"
+              class=${this.hiddenConstant ? 'hidden' : ''}
+              @click=${this._addConstantNode}
+            >
+              ${msg('Add constant')}
+            </button>
+            <span
+              class=${this.hiddenConstant ? 'hidden' : 'split-group'}
+            ></span>
             ${map(
-              this.constantList,
-              constant => html`
+              this.operators.filter(operator => operatorMap.has(operator.name)),
+              operator => html`
                 <button
-                  class="varbtn"
-                  .id=${`constbtn-${constant}`}
-                  @click=${this._addConstantNodeForm2List(constant)}
+                  class="optbtn"
+                  .id=${`${operatorMap.get(operator.name)}-btn`}
+                  @click=${this._addOperatorNode(operator.name)}
                 >
-                  ${constant}
+                  ${operator.name}
                 </button>
               `
             )}
+            ${map(
+              this.funcs.filter(func => funcMap.has(func.name)),
+              func => html`
+                <button
+                  class="optbtn"
+                  style="font-size: 12px"
+                  .id=${`${func.name}-btn`}
+                  @click=${this._addFunctionNode(func.name)}
+                >
+                  ${msg(func.name)}
+                </button>
+              `
+            )}
+            <div style="padding: 8px 0">
+              <span class="title-name">${msg('Attribute List')}:</span>
+              ${map(
+                this.variables,
+                variable => html`
+                  <button
+                    class="varbtn"
+                    .id=${`${variable.name}-btn`}
+                    @click=${this.operatorMode === 'variable'
+                      ? this._addSymbolNode2(variable)
+                      : this._addSymbolNode(variable.name)}
+                  >
+                    ${variable.name}
+                    ${this.operatorMode === 'variable' ? variable.op : '='}
+                    ${variable.test}
+                  </button>
+                `
+              )}
+            </div>
+            <div class=${this.operatorMode === 'variable' ? 'hidden' : ''}>
+              <span class="title-name">${msg('Constants List')}:</span>
+              ${map(
+                this.constantList,
+                constant => html`
+                  <button
+                    class="varbtn"
+                    .id=${`constbtn-${constant}`}
+                    @click=${this._addConstantNodeForm2List(constant)}
+                  >
+                    ${constant}
+                  </button>
+                `
+              )}
+            </div>
           </div>
         </div>
         <div
@@ -970,7 +1009,15 @@ export class ExpressionVisualizerWebComponent extends LitElement {
             `;
           })}
         </div>
-        <span class="err-msg">${this._errMsg}</span>
+        <div class="tox-statusbar">
+          <div class="expression-toolbar">
+            <span style="margin-right:25px">${msg('Expression')}:</span>
+            <span class=${this._expression ? '' : 'hidden'}
+              >${this._expression} = ${this._result}</span
+            >
+          </div>
+          <span class="err-msg">${this._errMsg}</span>
+        </div>
       </div>
     `;
   }
