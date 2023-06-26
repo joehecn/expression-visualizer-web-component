@@ -237,7 +237,7 @@ export class ExpressionVisualizerWebComponent extends LitElement {
     .expression-toolbar {
       display: flex;
       align-items: center;
-      padding-top>: 10px;
+      padding-top: 10px;
     }
   `;
 
