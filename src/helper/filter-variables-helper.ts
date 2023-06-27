@@ -13,7 +13,9 @@ export class FilterVariablesHelper extends LitElement {
   @property({ type: Array })
   list: {
     name: string;
+    op: string;
     test: boolean | number | string;
+    isFn?: string;
     hidden?: boolean;
   }[] = [];
 
@@ -27,7 +29,12 @@ export class FilterVariablesHelper extends LitElement {
   _test!: HTMLInputElement;
 
   onChanged() {
-    const filter = this.list.map(({ name, test }) => ({ name, test }));
+    const filter = this.list.map(({ name, op, test, isFn }) => ({
+      name,
+      op,
+      test,
+      isFn,
+    }));
 
     const detail = { filter };
     const event = new CustomEvent('filter-changed', {
@@ -69,7 +76,7 @@ export class FilterVariablesHelper extends LitElement {
       value = Number(value);
     }
 
-    this.list.push({ name: name.value, test: value });
+    this.list.push({ name: name.value, op: '=', test: value });
     this._name.value = '';
     this._test.value = '';
 

@@ -98,8 +98,6 @@ function _node2Blocks(node: any) {
       blocks = [block];
     }
   });
-
-  // console.log(JSON.stringify(blocks, null, 2))
   return blocks;
 }
 
@@ -709,7 +707,6 @@ export class ExpressionVisualizerWebComponent extends LitElement {
     const blocks: MathNode[] = JSON.parse(JSON.stringify(this._blocks));
 
     const { sourceId, targetId } = e.detail;
-    // console.log({ sourceId, targetId });
     const { node: sourceNode, parent: sourceParent } = this._findNodeAndParent(
       blocks,
       sourceId
@@ -719,13 +716,10 @@ export class ExpressionVisualizerWebComponent extends LitElement {
       targetId
     );
 
-    // console.log({ sourceNode, sourceParent, targetNode, targetParent });
     const { path, index } = sourceNode!;
-    // console.log({ path, index });
 
     sourceNode!.path = targetNode!.path;
     sourceNode!.index = targetNode!.index;
-    // console.log(targetNode!.path, targetNode!.index)
     targetParent!.args!.splice(targetNode!.index!, 1, sourceNode!);
 
     if (sourceParent) {
@@ -752,7 +746,6 @@ export class ExpressionVisualizerWebComponent extends LitElement {
     return (e: DragEvent) => {
       e.preventDefault();
 
-      // console.log("---- drop 2");
       if ((e.target as HTMLElement).className !== 'expression-visualizer')
         return;
 
@@ -762,7 +755,6 @@ export class ExpressionVisualizerWebComponent extends LitElement {
 
       const { node, parent } = this._findNodeAndParent(blocks, id);
 
-      // console.log({ node, parent })
       if (!node || !parent) return;
 
       // 原来的位置替换为 UNKNOWN
@@ -876,6 +868,7 @@ export class ExpressionVisualizerWebComponent extends LitElement {
           this.constantList.push(constant);
         }
       });
+      this._generateExpression();
       const event = new CustomEvent('variableList-changed', {
         detail: {
           constantList: this.constantList,
