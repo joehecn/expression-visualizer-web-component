@@ -868,7 +868,10 @@ export class ExpressionVisualizerWebComponent extends LitElement {
           this.constantList.push(constant);
         }
       });
-      this._generateExpression();
+      // 如果math 还没有加载出来的话不执行计算表达式的方法
+      if (this._hasMath) {
+        this._generateExpression();
+      }
       const event = new CustomEvent('variableList-changed', {
         detail: {
           constantList: this.constantList,
