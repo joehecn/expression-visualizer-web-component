@@ -15,15 +15,15 @@ const themeMap = new Map([
   [
     'light',
     {
-      expressionVisualizerStyle: 'background-color: #fff;',
-    },
+      expressionVisualizerStyle: 'background-color: #fff;'
+    }
   ],
   [
     'dark',
     {
-      expressionVisualizerStyle: 'background-color: #000;',
-    },
-  ],
+      expressionVisualizerStyle: 'background-color: #000;'
+    }
+  ]
 ]);
 
 const operatorMap = new Map([
@@ -42,7 +42,7 @@ const operatorMap = new Map([
   ['and', 'and'],
   ['or', 'or'],
   ['xor', 'xor'],
-  ['not', 'not'],
+  ['not', 'not']
 ]);
 
 const funcMap = new Map([['equalText', true]]);
@@ -109,7 +109,10 @@ function _handleDragOver(e: DragEvent) {
 async function _initMath() {
   // math
   if (!(window as any).math) {
-    await loadScript('https://unpkg.com/mathjs@11.8.0/lib/browser/math.js');
+    // await loadScript('https://unpkg.com/mathjs@11.8.0/lib/browser/math.js');
+    await loadScript(
+      'https://mega-automation.oss-cn-hongkong.aliyuncs.com/lib/unpkg.com_mathjs%4011.8.0_lib_browser_math.js'
+    );
   }
 
   const hasMath = !!(window as any).math;
@@ -269,7 +272,7 @@ export class ExpressionVisualizerWebComponent extends LitElement {
     { name: 'and' },
     { name: 'or' },
     { name: 'xor' },
-    { name: 'not' },
+    { name: 'not' }
   ];
 
   @property({ type: Array }) funcs: {
@@ -313,13 +316,13 @@ export class ExpressionVisualizerWebComponent extends LitElement {
     const detail = {
       expression: this._expression,
       result: this._result,
-      errMsg: this._errMsg,
+      errMsg: this._errMsg
     };
     const event = new CustomEvent('expression-changed', {
       detail,
       bubbles: true,
       composed: true,
-      cancelable: true,
+      cancelable: true
     });
     this.dispatchEvent(event);
   }
@@ -458,11 +461,11 @@ export class ExpressionVisualizerWebComponent extends LitElement {
       this.constantList.push(value);
       const event = new CustomEvent('variableList-changed', {
         detail: {
-          constantList: this.constantList,
+          constantList: this.constantList
         },
         bubbles: true,
         composed: true,
-        cancelable: true,
+        cancelable: true
       });
       this.dispatchEvent(event);
     }
@@ -470,7 +473,7 @@ export class ExpressionVisualizerWebComponent extends LitElement {
     const block = {
       type: 'ConstantNode',
       value,
-      uuid: uuidv4(),
+      uuid: uuidv4()
     };
 
     this._blocks = [block, ...this._blocks];
@@ -504,7 +507,7 @@ export class ExpressionVisualizerWebComponent extends LitElement {
       const block = {
         type: 'ConstantNode',
         value,
-        uuid: uuidv4(),
+        uuid: uuidv4()
       };
 
       this._blocks = [block, ...this._blocks];
@@ -538,10 +541,10 @@ export class ExpressionVisualizerWebComponent extends LitElement {
               uuid: uuidv4(),
               isUnknown: true,
               path: 'args[0]',
-              index: 0,
-            },
+              index: 0
+            }
           ],
-          type: 'OperatorNode',
+          type: 'OperatorNode'
         };
       } else {
         block = {
@@ -557,7 +560,7 @@ export class ExpressionVisualizerWebComponent extends LitElement {
               uuid: uuidv4(),
               isUnknown: true,
               path: 'args[0]',
-              index: 0,
+              index: 0
             },
             {
               type: 'ConstantNode',
@@ -565,10 +568,10 @@ export class ExpressionVisualizerWebComponent extends LitElement {
               uuid: uuidv4(),
               isUnknown: true,
               path: 'args[1]',
-              index: 1,
-            },
+              index: 1
+            }
           ],
-          type: 'OperatorNode',
+          type: 'OperatorNode'
         };
       }
 
@@ -587,7 +590,7 @@ export class ExpressionVisualizerWebComponent extends LitElement {
         implicit: false,
         isPercentage: false,
         fn: {
-          name,
+          name
         },
         args: [
           {
@@ -596,7 +599,7 @@ export class ExpressionVisualizerWebComponent extends LitElement {
             uuid: uuidv4(),
             isUnknown: true,
             path: 'args[0]',
-            index: 0,
+            index: 0
           },
           {
             type: 'ConstantNode',
@@ -604,10 +607,10 @@ export class ExpressionVisualizerWebComponent extends LitElement {
             uuid: uuidv4(),
             isUnknown: true,
             path: 'args[1]',
-            index: 1,
-          },
+            index: 1
+          }
         ],
-        type: 'FunctionNode',
+        type: 'FunctionNode'
       };
 
       this._blocks = [block, ...this._blocks];
@@ -623,7 +626,7 @@ export class ExpressionVisualizerWebComponent extends LitElement {
       const block = {
         type: 'SymbolNode',
         name,
-        uuid: uuidv4(),
+        uuid: uuidv4()
       };
 
       this._blocks = [block, ...this._blocks];
@@ -646,23 +649,23 @@ export class ExpressionVisualizerWebComponent extends LitElement {
               uuid: uuidv4(),
               path: 'args[0]',
               index: 0,
-              name: variable.name,
+              name: variable.name
             },
             {
               type: 'ConstantNode',
               value: variable.test,
               uuid: uuidv4(),
               path: 'args[1]',
-              index: 1,
-            },
+              index: 1
+            }
           ],
           fn: {
-            name: variable.isFn,
+            name: variable.isFn
           },
           implicit: false,
           isPercentage: false,
           type: 'FunctionNode',
-          uuid: uuidv4(),
+          uuid: uuidv4()
         };
       } else {
         block = {
@@ -677,17 +680,17 @@ export class ExpressionVisualizerWebComponent extends LitElement {
               uuid: uuidv4(),
               path: 'args[0]',
               index: 0,
-              name: variable.name,
+              name: variable.name
             },
             {
               type: 'ConstantNode',
               value: variable.test,
               uuid: uuidv4(),
               path: 'args[1]',
-              index: 1,
-            },
+              index: 1
+            }
           ],
-          type: 'OperatorNode',
+          type: 'OperatorNode'
         };
       }
 
@@ -729,7 +732,7 @@ export class ExpressionVisualizerWebComponent extends LitElement {
         uuid: uuidv4(),
         isUnknown: true,
         path,
-        index,
+        index
       });
       this._blocks = blocks;
     } else {
@@ -764,7 +767,7 @@ export class ExpressionVisualizerWebComponent extends LitElement {
         uuid: uuidv4(),
         isUnknown: true,
         path: node!.path,
-        index: node!.index!,
+        index: node!.index!
       });
 
       // e.target 一定是class="expression-visualizer" 的 div
@@ -810,7 +813,7 @@ export class ExpressionVisualizerWebComponent extends LitElement {
         detail,
         bubbles: true,
         composed: true,
-        cancelable: true,
+        cancelable: true
       });
       this.dispatchEvent(event);
     });
@@ -874,11 +877,11 @@ export class ExpressionVisualizerWebComponent extends LitElement {
       }
       const event = new CustomEvent('variableList-changed', {
         detail: {
-          constantList: this.constantList,
+          constantList: this.constantList
         },
         bubbles: true,
         composed: true,
-        cancelable: true,
+        cancelable: true
       });
       this.dispatchEvent(event);
     }
