@@ -96,7 +96,10 @@ export class TreeComponent extends LitElement {
     value: 'U',
   };
 
-  @property({ type: String }) operatorMode: 'default' | 'variable' = 'default';
+  @property({ type: String }) operatorMode:
+    | 'default'
+    | 'variable'
+    | 'variableExpre' = 'default';
 
   private _handleDrop(e: DragEvent) {
     e.preventDefault();
@@ -123,10 +126,12 @@ export class TreeComponent extends LitElement {
           return html`
             <span
               id=${block.uuid}
-              class=${this.operatorMode === 'variable'
+              class=${this.operatorMode === 'variable' ||
+              this.operatorMode === 'variableExpre'
                 ? 'block leaf unknown variablemode'
                 : 'block leaf unknown'}
-              droppable=${this.operatorMode !== 'variable'}
+              droppable=${this.operatorMode !== 'variable' &&
+              this.operatorMode !== 'variableExpre'}
               .ondragover=${_handleDragOver}
               .ondragleave=${_handleDragLeave}
               .ondrop=${this._handleDrop}
@@ -139,10 +144,12 @@ export class TreeComponent extends LitElement {
         return html`
           <span
             id=${block.uuid}
-            class=${this.operatorMode === 'variable'
+            class=${this.operatorMode === 'variable' ||
+            this.operatorMode === 'variableExpre'
               ? 'block leaf variablemode'
               : 'block leaf'}
-            draggable=${this.operatorMode !== 'variable'}
+            draggable=${this.operatorMode !== 'variable' &&
+            this.operatorMode !== 'variableExpre'}
             .ondragstart=${_handleDragStart}
             .ondragleave=${_handleDragLeave}
             >${block.value}</span
@@ -153,10 +160,12 @@ export class TreeComponent extends LitElement {
         return html`
           <span
             id=${block.uuid}
-            class=${this.operatorMode === 'variable'
+            class=${this.operatorMode === 'variable' ||
+            this.operatorMode === 'variableExpre'
               ? 'block leaf variablemode'
               : 'block leaf'}
-            draggable=${this.operatorMode !== 'variable'}
+            draggable=${this.operatorMode !== 'variable' &&
+            this.operatorMode !== 'variableExpre'}
             .ondragstart=${_handleDragStart}
             .ondragleave=${_handleDragLeave}
             >${block.name}</span

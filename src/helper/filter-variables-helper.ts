@@ -12,15 +12,21 @@ export class FilterVariablesHelper extends LitElement {
 
   @property({ type: Array })
   list: {
-    name: string;
-    op: string;
-    test: boolean | number | string;
-    isFn?: string;
     hidden?: boolean;
+    name: string;
+    test: string | number | boolean;
+    isExpression?: boolean; // 是否是一个表达式
+    varib?: string;
+    isHidden?: boolean; // 是否隐藏该表达式
+    op?: string;
+    isFn?: string;
   }[] = [];
 
   @state()
   private _errMsg = '';
+
+  @state()
+  private _isVarib = false;
 
   @query('#name-input')
   _name!: HTMLInputElement;
@@ -28,13 +34,20 @@ export class FilterVariablesHelper extends LitElement {
   @query('#test-input')
   _test!: HTMLInputElement;
 
+  @query('#op') _op!: HTMLInputElement;
+
   onChanged() {
-    const filter = this.list.map(({ name, op, test, isFn }) => ({
-      name,
-      op,
-      test,
-      isFn,
-    }));
+    const filter = this.list.map(
+      ({ name, op, test, isFn, isExpression, isHidden, varib }) => ({
+        name,
+        op,
+        test,
+        isFn,
+        isExpression,
+        isHidden,
+        varib,
+      })
+    );
 
     const detail = { filter };
     const event = new CustomEvent('filter-changed', {
@@ -61,6 +74,8 @@ export class FilterVariablesHelper extends LitElement {
       return;
     }
 
+    const { _op: op } = this;
+
     // 变量名不能重复
     if (this.list.find(item => item.name === name.value)) {
       this._errMsg = 'Name is duplicated';
@@ -76,7 +91,37 @@ export class FilterVariablesHelper extends LitElement {
       value = Number(value);
     }
 
-    this.list.push({ name: name.value, op: '=', test: value });
+    // name: string;
+    // test: string | number | boolean;
+    // isExpression?: boolean,  // 是否是一个表达式
+    // varib?: '',
+    // isHidden?: boolean, // 是否隐藏该表达式
+    // op?: string;
+    // isFn?: string;
+
+    let obj: any = {};
+    console.log(this._isVarib);
+    if (this._isVarib) {
+      obj = {
+        name: name.value,
+        test: 10,
+        isExpression: true, // 是否是一个表达式
+        varib: value,
+        isHidden: false, // 是否隐藏该表达式
+        op: op.value,
+      };
+    } else {
+      obj = {
+        name: name.value,
+        test: value,
+        isExpression: false, // 是否是一个表达式
+        varib: value,
+        isHidden: false, // 是否隐藏该表达式
+        op: '==',
+      };
+    }
+
+    this.list.push(obj);
     this._name.value = '';
     this._test.value = '';
 
@@ -94,12 +139,24 @@ export class FilterVariablesHelper extends LitElement {
     };
   }
 
+  // 常熟输入框 是否隐藏
+  checkedChanged(e: Event) {
+    this._isVarib = (e.target as HTMLInputElement).checked;
+  }
+
   render() {
     return html`
       <div>
         <input id="name-input" placeholder="Input a variable name" />
+        <input id="op" />
         <input id="test-input" placeholder="Input a test value" />
         <button @click=${this.addItem}>Add</button>
+        <input
+          id="chceked"
+          type="checkbox"
+          .checked=${this._isVarib}
+          @change=${this.checkedChanged}
+        />
         <div class="err-msg">${this._errMsg}</div>
       </div>
 
@@ -109,7 +166,7 @@ export class FilterVariablesHelper extends LitElement {
           (item, index) => html`
             <li>
               <label>
-                ${item.name} = ${item.test}
+                ${item.name} ${item.op} ${item.test}
                 <button @click=${this.deleteItem(index)}>Delete</button>
               </label>
             </li>

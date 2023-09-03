@@ -43,18 +43,33 @@ const _funcs = [{ name: 'equalText' }];
 const _variables: {
   name: string;
   test: string | number | boolean;
+  isExpression?: boolean; // 是否是一个表达式
+  varib?: string;
+  isHidden?: boolean; // 是否隐藏该表达式
   op?: string;
   isFn?: string;
 }[] = [
-  { name: 'variable1', test: 1, op: '>' },
-  { name: 'variable2', test: true, op: '==' },
-  { name: 'variable3', test: false, op: '!=' },
-  { name: 'variable4', test: 'abc', op: '==', isFn: 'equalText' },
+  {
+    name: 'v1',
+    test: 10,
+    isExpression: false, // 是否是一个表达式
+    varib: '10',
+    isHidden: false, // 是否隐藏该表达式
+    op: '==',
+  },
+  {
+    name: 'v2',
+    test: 5,
+    isExpression: true, // 是否是一个表达式
+    varib: 'v1',
+    isHidden: false, // 是否隐藏该表达式
+    op: '>',
+  },
 ];
 
-const _operatorMode = 'default';
+const _operatorMode = 'variableExpre';
 
-const _operatorModeList = ['default', 'variable'];
+const _operatorModeList = ['default', 'variable', 'variableExpre'];
 
 @customElement('demo-helper')
 export class DemoHelper extends LitElement {
@@ -100,7 +115,12 @@ export class DemoHelper extends LitElement {
   @state()
   private variables: {
     name: string;
-    test: boolean | number | string;
+    test: string | number | boolean;
+    isExpression?: boolean | undefined;
+    varib?: string | undefined;
+    isHidden?: boolean | undefined;
+    op?: string | undefined;
+    isFn?: string | undefined;
   }[] = _variables;
 
   @query('#expression-input')
@@ -165,6 +185,7 @@ export class DemoHelper extends LitElement {
 
   onVariablesChanged(e: CustomEvent) {
     this.variables = e.detail.filter;
+    console.log(e.detail.filter);
   }
 
   modeChanged(e: Event) {

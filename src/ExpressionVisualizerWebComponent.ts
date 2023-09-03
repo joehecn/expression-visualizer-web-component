@@ -51,6 +51,11 @@ function _getScope(
   variables: {
     name: string;
     test: string | number | boolean;
+    isExpression?: boolean | undefined;
+    varib?: string | undefined;
+    isHidden?: boolean | undefined;
+    op?: string | undefined;
+    isFn?: string | undefined;
   }[]
 ) {
   const scope: any = {};
@@ -282,11 +287,17 @@ export class ExpressionVisualizerWebComponent extends LitElement {
   @property({ type: Array }) variables: {
     name: string;
     test: string | number | boolean;
+    isExpression?: boolean; // 是否是一个表达式
+    varib?: string;
+    isHidden?: boolean; // 是否隐藏该表达式
     op?: string;
     isFn?: string;
   }[] = [];
 
-  @property({ type: String }) operatorMode: 'default' | 'variable' = 'default';
+  @property({ type: String }) operatorMode:
+    | 'default'
+    | 'variable'
+    | 'variableExpre' = 'default';
 
   @state()
   _curTheme = themeMap.get(this.theme);
@@ -701,6 +712,106 @@ export class ExpressionVisualizerWebComponent extends LitElement {
     };
   }
 
+  // 添加变量
+  private _addSymbolNode3(variable: any) {
+    return () => {
+      let block: any;
+
+      if (variable.isFn) {
+        block = {
+          args: [
+            {
+              type: 'SymbolNode',
+              uuid: uuidv4(),
+              path: 'args[0]',
+              index: 0,
+              name: variable.name,
+            },
+            {
+              type: 'ConstantNode',
+              value: variable.test,
+              uuid: uuidv4(),
+              path: 'args[1]',
+              index: 1,
+            },
+          ],
+          fn: {
+            name: variable.isFn,
+          },
+          implicit: false,
+          isPercentage: false,
+          type: 'FunctionNode',
+          uuid: uuidv4(),
+        };
+      } else {
+        let v1: any;
+        let v2: any;
+        // 如果是值为表达式 那么在所有表达式中寻找该表达式
+        if (variable.isExpression) {
+          const varib2 = this.variables.find(
+            varib => variable.varib === varib.name
+          )!;
+          v1 = {
+            type: 'SymbolNode',
+            uuid: uuidv4(),
+            path: 'args[0]',
+            index: 0,
+            name: variable.name,
+          };
+          v2 = {
+            type: 'SymbolNode',
+            uuid: uuidv4(),
+            path: 'args[1]',
+            index: 1,
+            name: varib2.name,
+          };
+        } else {
+          v1 = {
+            type: 'SymbolNode',
+            uuid: uuidv4(),
+            path: 'args[0]',
+            index: 0,
+            name: variable.name,
+          };
+          v2 = {
+            type: 'ConstantNode',
+            value: variable.test,
+            uuid: uuidv4(),
+            path: 'args[1]',
+            index: 1,
+          };
+        }
+        block = {
+          uuid: uuidv4(),
+          implicit: false,
+          isPercentage: false,
+          op: variable.op,
+          fn: operatorMap.get(variable.op),
+          args: [v1, v2],
+          type: 'OperatorNode',
+        };
+      }
+
+      this._blocks = [block, ...this._blocks];
+
+      // 表达式
+      this._generateExpression();
+    };
+  }
+
+  _addSymbolNodeIsMode(mode: string, variable: any) {
+    if (mode === 'default') {
+      return this._addSymbolNode(variable.name);
+    }
+    if (mode === 'variable') {
+      return this._addSymbolNode2(variable);
+    }
+    if (mode === 'variableExpre') {
+      return this._addSymbolNode3(variable);
+    }
+    return this._addSymbolNode(variable.name);
+  }
+
   // 修改
   // 子组件上报事件
   // 拖拽一个表达式到另一个表达式的插槽
@@ -708,7 +819,6 @@ export class ExpressionVisualizerWebComponent extends LitElement {
     e.preventDefault();
 
     const blocks: MathNode[] = JSON.parse(JSON.stringify(this._blocks));
-
     const { sourceId, targetId } = e.detail;
     const { node: sourceNode, parent: sourceParent } = this._findNodeAndParent(
       blocks,
@@ -738,6 +848,8 @@ export class ExpressionVisualizerWebComponent extends LitElement {
     } else {
       this._blocks = blocks.filter(block => block.uuid !== sourceNode!.uuid);
     }
+
+    console.log(this._blocks);
 
     // 表达式
     this._generateExpression();
@@ -952,13 +1064,19 @@ export class ExpressionVisualizerWebComponent extends LitElement {
                   <button
                     class="varbtn"
                     .id=${`${variable.name}-btn`}
-                    @click=${this.operatorMode === 'variable'
-                      ? this._addSymbolNode2(variable)
-                      : this._addSymbolNode(variable.name)}
+                    @click=${this._addSymbolNodeIsMode(
+                      this.operatorMode,
+                      variable
+                    )}
                   >
                     ${variable.name}
-                    ${this.operatorMode === 'variable' ? variable.op : '='}
-                    ${variable.test}
+                    ${this.operatorMode === 'variable' ||
+                    this.operatorMode === 'variableExpre'
+                      ? variable.op
+                      : '=='}
+                    ${this.operatorMode === 'variableExpre'
+                      ? variable.varib
+                      : variable.test}
                   </button>
                 `
               )}
