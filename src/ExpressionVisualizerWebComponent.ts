@@ -320,6 +320,17 @@ export class ExpressionVisualizerWebComponent extends LitElement {
   @state()
   _errMsg = '';
 
+  @state()
+  _variables: {
+    name: string;
+    test: string | number | boolean;
+    isExpression?: boolean; // 是否是一个表达式
+    varib?: string;
+    isHidden?: boolean; // 是否隐藏该表达式
+    op?: string;
+    isFn?: string;
+  }[] = [];
+
   @query('#newconstant-input')
   _input!: HTMLInputElement;
 
@@ -977,6 +988,8 @@ export class ExpressionVisualizerWebComponent extends LitElement {
     }
 
     if (changedProperties.has('variables')) {
+      this._variables = this.variables.filter(varib => !varib.isHidden);
+      console.log(this._variables);
       const variableValue = this.variables.map(item => item.test);
       variableValue.forEach(constant => {
         if (!this.constantList.includes(constant)) {
@@ -1059,7 +1072,7 @@ export class ExpressionVisualizerWebComponent extends LitElement {
             <div style="padding: 8px 0">
               <span class="title-name">${msg('Attribute List')}:</span>
               ${map(
-                this.variables,
+                this._variables,
                 variable => html`
                   <button
                     class="varbtn"

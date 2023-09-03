@@ -54,7 +54,7 @@ const _variables: {
     test: 10,
     isExpression: false, // 是否是一个表达式
     varib: '10',
-    isHidden: false, // 是否隐藏该表达式
+    isHidden: true, // 是否隐藏该表达式
     op: '==',
   },
   {
