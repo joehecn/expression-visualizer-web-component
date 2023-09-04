@@ -1094,7 +1094,12 @@ export class ExpressionVisualizerWebComponent extends LitElement {
                 `
               )}
             </div>
-            <div class=${this.operatorMode === 'variable' ? 'hidden' : ''}>
+            <div
+              class=${this.operatorMode === 'variable' ||
+              this.operatorMode === 'variableExpre'
+                ? 'hidden'
+                : ''}
+            >
               <span class="title-name">${msg('Constants List')}:</span>
               ${map(
                 this.constantList,
