@@ -48,7 +48,9 @@ const operatorMap = new Map([
 const funcMap = new Map([
   ['equalText', true],
   ['belong', true],
-  ['isInRange', true],
+  ['not belong', true],
+  ['inrange', true],
+  ['not inrange', true],
 ]);
 
 /**
@@ -71,16 +73,17 @@ function belong(val: any, str: string) {
  * @param arr
  * @returns
  */
-function isInRange(val: number, arr: string) {
+function inrange(val: number, arrStr: string) {
   let result = false;
-  if (typeof arr === 'string') {
-    try {
-      const arrs = JSON.parse(arr);
-      result = val >= arrs[0] && val <= arrs[1];
-    } catch (error: any) {
-      result = false;
-    }
+
+  try {
+    const arrs = arrStr.split('-');
+    const [min, max] = arrs;
+    result = val >= Number(min) && val <= Number(max);
+  } catch (error: any) {
+    result = false;
   }
+
   return result;
 }
 function _getScope(
@@ -96,13 +99,13 @@ function _getScope(
 ) {
   const scope: any = {};
   scope.belong = belong;
-  scope.isInRange = isInRange;
+  scope.inrange = inrange;
   for (let i = 0; i < variables.length; i += 1) {
     const variable = variables[i];
     if (variable.isFn === 'belong' && typeof variable.test === 'string') {
       const [firstValue] = variable.test.split(',');
       scope[variable.name] = firstValue;
-    } else if (variable.isFn === 'isInRange') {
+    } else if (variable.isFn === 'inrange') {
       if (typeof variable.test === 'string') {
         try {
           const arrs = JSON.parse(variable.test);
@@ -335,7 +338,13 @@ export class ExpressionVisualizerWebComponent extends LitElement {
 
   @property({ type: Array }) funcs: {
     name: string;
-  }[] = [{ name: 'equalText' }, { name: 'belong' }, { name: 'isInRange' }];
+  }[] = [
+    { name: 'equalText' },
+    { name: 'belong' },
+    { name: 'inrange' },
+    { name: 'not belong' },
+    { name: 'not inrange' },
+  ];
 
   @property({ type: Array }) variables: {
     name: string;
