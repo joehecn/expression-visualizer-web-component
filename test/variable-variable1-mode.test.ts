@@ -27,6 +27,8 @@ describe('variable-variable1-mode', function t() {
       { name: 'variable2', test: true, op: '==' },
       { name: 'variable3', test: false, op: '!=' },
       { name: 'variable4', test: 'abc', op: '==', isFn: 'equalText' },
+      { name: 'variable5', test: 'cs,dd', op: '==', isFn: 'belong' },
+      { name: 'variable6', test: '[1,6]', op: '==', isFn: 'isInRange' },
     ];
 
     const el = await fixtureSync<ExpressionVisualizerWebComponent>(

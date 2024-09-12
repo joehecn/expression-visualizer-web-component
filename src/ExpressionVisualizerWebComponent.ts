@@ -76,7 +76,7 @@ function isInRange(val: number, arr: string) {
   if (typeof arr === 'string') {
     try {
       const arrs = JSON.parse(arr);
-      result = val > arrs[0] && val < arrs[1];
+      result = val >= arrs[0] && val <= arrs[1];
     } catch (error: any) {
       result = false;
     }
@@ -102,8 +102,19 @@ function _getScope(
     if (variable.isFn === 'belong' && typeof variable.test === 'string') {
       const [firstValue] = variable.test.split(',');
       scope[variable.name] = firstValue;
+    } else if (variable.isFn === 'isInRange') {
+      if (typeof variable.test === 'string') {
+        try {
+          const arrs = JSON.parse(variable.test);
+          const [min] = arrs;
+          scope[variable.name] = min;
+        } catch (error: any) {
+          scope[variable.name] = -1;
+        }
+      }
+    } else {
+      scope[variable.name] = variable.test;
     }
-    scope[variable.name] = variable.test;
   }
 
   return scope;

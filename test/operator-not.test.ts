@@ -27,6 +27,8 @@ describe('operator not', function t() {
       { name: 'variable2', test: true },
       { name: 'variable3', test: false },
       { name: 'variable4', test: 'abc' },
+      { name: 'variable5', test: 'cs,dd' },
+      { name: 'variable6', test: '[1,6]' },
     ];
 
     const el = await fixtureSync<ExpressionVisualizerWebComponent>(

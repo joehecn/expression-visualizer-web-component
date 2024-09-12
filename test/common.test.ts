@@ -32,7 +32,11 @@ describe('common', () => {
       { name: 'xor' },
       { name: 'not' },
     ]);
-    expect(el.funcs).to.have.deep.members([{ name: 'equalText' }]);
+    expect(el.funcs).to.have.deep.members([
+      { name: 'equalText' },
+      { name: 'belong' },
+      { name: 'isInRange' },
+    ]);
     expect(el.variables.length).to.equal(0);
   });
 
