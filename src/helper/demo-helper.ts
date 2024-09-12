@@ -189,7 +189,6 @@ export class DemoHelper extends LitElement {
 
   onVariablesChanged(e: CustomEvent) {
     this.variables = e.detail.filter;
-    console.log(e.detail.filter);
   }
 
   modeChanged(e: Event) {
