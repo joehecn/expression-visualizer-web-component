@@ -45,8 +45,44 @@ const operatorMap = new Map([
   ['not', 'not'],
 ]);
 
-const funcMap = new Map([['equalText', true]]);
+const funcMap = new Map([
+  ['equalText', true],
+  ['belong', true],
+  ['isInRange', true],
+]);
 
+/**
+ * 自定义方法 判断数组中是否包含该值
+ * @param val
+ * @param arr
+ * @returns
+ */
+function belong(val: any, str: string) {
+  try {
+    return str.split(',').includes(val);
+  } catch (error) {
+    return false;
+  }
+}
+
+/**
+ * 自定义方法 判断该数值是否在某个范围内
+ * @param val
+ * @param arr
+ * @returns
+ */
+function isInRange(val: number, arr: string) {
+  let result = false;
+  if (typeof arr === 'string') {
+    try {
+      const arrs = JSON.parse(arr);
+      result = val > arrs[0] && val < arrs[1];
+    } catch (error: any) {
+      result = false;
+    }
+  }
+  return result;
+}
 function _getScope(
   variables: {
     name: string;
@@ -59,8 +95,14 @@ function _getScope(
   }[]
 ) {
   const scope: any = {};
+  scope.belong = belong;
+  scope.isInRange = isInRange;
   for (let i = 0; i < variables.length; i += 1) {
     const variable = variables[i];
+    if (variable.isFn === 'belong' && typeof variable.test === 'string') {
+      const [firstValue] = variable.test.split(',');
+      scope[variable.name] = firstValue;
+    }
     scope[variable.name] = variable.test;
   }
 
@@ -282,7 +324,7 @@ export class ExpressionVisualizerWebComponent extends LitElement {
 
   @property({ type: Array }) funcs: {
     name: string;
-  }[] = [{ name: 'equalText' }];
+  }[] = [{ name: 'equalText' }, { name: 'belong' }, { name: 'isInRange' }];
 
   @property({ type: Array }) variables: {
     name: string;
@@ -860,8 +902,6 @@ export class ExpressionVisualizerWebComponent extends LitElement {
       this._blocks = blocks.filter(block => block.uuid !== sourceNode!.uuid);
     }
 
-    console.log(this._blocks);
-
     // 表达式
     this._generateExpression();
   }
@@ -951,14 +991,7 @@ export class ExpressionVisualizerWebComponent extends LitElement {
 
   willUpdate(changedProperties: PropertyValues<this>) {
     if (changedProperties.has('locale')) {
-      setLocale(this.locale).then(() => {
-        // eslint-disable-next-line no-console
-        console.log(
-          '[expression-visualizer]: willUpdate -> locale changed:',
-          changedProperties.get('locale'),
-          this.locale
-        );
-      });
+      setLocale(this.locale).then(() => {});
     }
 
     if (
@@ -968,28 +1001,15 @@ export class ExpressionVisualizerWebComponent extends LitElement {
       if (this._hasMath) {
         // 每当传入表达式字符串发生变化时，都会触发这个函数
         this._setExpression(this.expression);
-        // eslint-disable-next-line no-console
-        console.log(
-          '[expression-visualizer]: willUpdate -> expression changed:',
-          changedProperties.get('expression'),
-          this.expression
-        );
       }
     }
 
     if (changedProperties.has('theme')) {
       this._curTheme = themeMap.get(this.theme);
-      // eslint-disable-next-line no-console
-      console.log(
-        '[expression-visualizer]: willUpdate -> theme changed:',
-        changedProperties.get('theme'),
-        this.expression
-      );
     }
 
     if (changedProperties.has('variables')) {
       this._variables = this.variables.filter(varib => !varib.isHidden);
-      console.log(this._variables);
       const variableValue = this.variables.map(item => item.test);
       variableValue.forEach(constant => {
         if (!this.constantList.includes(constant)) {

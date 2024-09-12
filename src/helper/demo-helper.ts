@@ -38,7 +38,11 @@ const _operators1 = [
   { name: 'not' },
 ];
 
-const _funcs = [{ name: 'equalText' }];
+const _funcs = [
+  { name: 'equalText' },
+  { name: 'belong' },
+  { name: 'isInRange' },
+];
 
 const _variables: {
   name: string;

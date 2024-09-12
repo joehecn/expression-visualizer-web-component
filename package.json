@@ -16,7 +16,7 @@
     "mathjs"
   ],
   "author": "leanbrown@live.cn",
-  "version": "0.0.40",
+  "version": "0.0.41",
   "main": "dist/src/index.js",
   "module": "dist/src/index.js",
   "exports": {

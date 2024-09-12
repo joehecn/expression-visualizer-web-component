@@ -100,7 +100,6 @@ export class FilterVariablesHelper extends LitElement {
     // isFn?: string;
 
     let obj: any = {};
-    console.log(this._isVarib);
     if (this._isVarib) {
       obj = {
         name: name.value,
